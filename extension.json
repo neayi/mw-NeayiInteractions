@@ -1,0 +1,58 @@
+{
+	"name": "NeayiInteractions",
+	"version": "1.0",
+	"author": [
+		"[https://www.mediawiki.org/wiki/User:BertrandGorge Berrtand Gorge]"
+	],
+	"url": "https://www.mediawiki.org/wiki/Extension:NeayiInteractions",
+	"descriptionmsg": "NeayiInteractions-desc",
+	"manifest_version": 1,
+	"type": "parserhook",
+	"license-name": "MIT",
+	"requires": {
+		"MediaWiki": ">= 1.35.0"
+	},
+	"MessagesDirs": {
+		"NeayiInteractions": [
+			"i18n"
+		]
+	},
+	"ResourceModules": {
+		"ext.NeayiInteractions": {
+			"styles": [
+				"NeayiInteractions.css"
+			],
+			"scripts": [
+				"NeayiInteractionsQuerier.js",
+				"NeayiInteractions.js"
+			],
+			"dependencies": [
+				"oojs-ui"
+			],
+			"targets": [
+				"desktop",
+				"mobile"
+			],
+			"messages": [
+				"NeayiInteractions-buttontext-Neayi-permalink"
+			]
+		}
+	},
+	"ResourceFileModulePaths": {
+		"localBasePath": "resources",
+		"remoteExtPath": "NeayiInteractions/resources"
+	},
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\NeayiInteractions\\": "includes/"
+	},
+	"APIModules": {
+
+	},
+	"Hooks": {
+		
+		"BeforePageDisplay": "MediaWiki\\Extension\\NeayiInteractions\\NeayiInteractionsHooks::initializeJS"
+	},
+	"config": {
+		"NeayiInteractionsAllowedNamespaces" : null
+	}
+}
