@@ -143,27 +143,93 @@ var neayiinteractions_controller = ( function () {
 					</div>
 				</div>`).prependTo( '.contentHeader' );
 
+				// Modale - Connectez-vous
 				$(`<div class="modal fade" id="requiresLoginModal" tabindex="-1" aria-labelledby="requiresLoginModal" aria-hidden="true">
 					<div class="modal-dialog">
 						<div class="modal-content">
-							<div class="modal-header">
+							<div class="modal-header border-bottom-0">
 							<img width="200" src="/skins/skin-neayi/favicon/logo-triple-performance.svg" alt="Wiki Triple Performance">
 							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 								<span aria-hidden="true">&times;</span>
 							</button>
 							</div>
 							<div class="modal-body">
-								<p>Pour pouvoir suivre la page et recevoir des notifications quand elle est mise à jour ou lors de nouvelles questions,
-								vous devez vous connecter ou créer un compte.</p>
+								<p>Connectez-vous ou créez un compte afin de rejoindre la communauté qui s'intéresse à ce sujet en particulier. Recevez
+								des notifications lors de nouveaux commentaires sur cette page, partagez votre expérience !</p>
 
 								<p>Cette opération ne prend qu'une minute !</p>
 							</div>
-							<div class="modal-footer">
-								<a class="btn btn-success" href="/index.php?title=Special:Login&returnto=${relevantPageName}">Créer un compte ou se connecter <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">arrow_forward</span></a>
+							<div class="modal-footer border-top-0">
+								<a class="btn btn-success" href="/index.php?title=Special:Login&returnto=${relevantPageName}">Créez un compte ou connectez-vous <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">arrow_forward</span></a>
 							</div>
 						</div>
 					</div>
 				</div>`).appendTo( 'body' );
+				
+				// Modale - Connectez-vous (svp)
+				$(`<div class="modal fade" id="inviteLoginModal" tabindex="-1" aria-labelledby="requiresLoginModal" aria-hidden="true">
+					<div class="modal-dialog  modal-lg">
+						<div class="modal-content">
+							<div class="modal-header border-bottom-0">
+							<img width="200" src="/skins/skin-neayi/favicon/logo-triple-performance.svg" alt="Wiki Triple Performance">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							</div>
+							<div class="modal-body">
+								<p>Merci pour vos encouragements, ils sont appréciés par l'ensemble des membres de la communauté !</p>
+
+								<p>Connectez-vous ou créez un compte afin de nous rejoindre, pour pouvoir suivre les pages, commenter ou partager votre expérience !
+								   (Cette opération ne prend qu'une minute !)</p>
+							</div>
+							<div class="modal-footer border-top-0">
+								<a class="text-primary not-yet-link" data-dismiss="modal" id="tellUsMoreModalDismiss" href="#">Non merci pas encore</a>
+								<a class="btn btn-success" href="/index.php?title=Special:Login&returnto=${relevantPageName}">Créez un compte ou connectez-vous <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">arrow_forward</span></a>
+							</div>
+						</div>
+					</div>
+				</div>`).appendTo( 'body' );
+
+				// Modale - Merci
+				$(`<div class="modal fade" id="tellUsMoreModal" tabindex="-1" data-backdrop="static" aria-labelledby="tellUsMoreModal" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<form id="tellUsMoreForm">
+								<div class="modal-header border-bottom-0">
+								<h1 class="border-bottom-0">Merci !</h1>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+								</div>
+								<div class="modal-body">
+									<p>Dites en plus à la commauté pour enrichir vos échanges avec les autres agriculteurs</p>
+									<div class="row">
+										<div class="col form-group">
+											<label for="sinceInputId">Depuis quand ? <a href="#" role="button" class="badge badge-pill badge-light popover-neayi-help" data-toggle="popover" data-trigger="focus" title="Depuis quand ?" data-content="Renseignez l'année où vous avez démarré cette technique, afin d'aider les autres à comprendre votre degré d'expérience sur le sujet !">?</a></label>
+											<select class="form-control" id="sinceInputId" name="since"></select>
+										</div>
+									</div>
+								</div>
+								<div class="modal-footer border-top-0">
+									<a class="text-primary not-yet-link" data-dismiss="modal" id="tellUsMoreModalDismiss" href="#">Non merci pas encore</a>
+									<button class="btn btn-primary" id="tellUsMoreModalSubmit">Enregistrer</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>`).appendTo( 'body' );
+				
+				$(function () {
+					$('.popover-neayi-help').popover()
+				})
+
+				const theYear = new Date();
+				for (let year = theYear.getFullYear(); year > 2004; year--) {
+					$( '#sinceInputId' ).append($('<option>', { 
+						value: year,
+						text : year 
+					}));
+				}
 
 				var chameleonMenu = $( "#p-contentnavigation" ).parent();
 				$( "#p-contentnavigation" ).appendTo( "#neayi-interaction-mobile-menu" );
@@ -186,7 +252,7 @@ var neayiinteractions_controller = ( function () {
 				this.setDoneItLabels();
 
 				var CSConfig = mw.config.get( 'CommentStreams' );
-				if (CSConfig.comments && CSConfig.comments.length > 0)
+				if (CSConfig && CSConfig.comments && CSConfig.comments.length > 0)
 				{
 					var nbQuestionsAvecReponses = 0;
 					var parentIndex;
@@ -316,6 +382,11 @@ var neayiinteractions_controller = ( function () {
 				// End API Success
 
 				e.preventDefault();
+
+				if (mw.user.isAnon()) {
+					$('#inviteLoginModal').modal('show')
+					return;
+				}				
 			} );
 		
 		},
@@ -341,6 +412,11 @@ var neayiinteractions_controller = ( function () {
 			var self = this;
 
 			buttons.on( 'click', function ( e ) {
+				
+				if (mw.user.isAnon()) {
+					$('#requiresLoginModal').modal('show')
+					return;
+				}
 
 				var bDoneIt = mw.config.get( 'mwDoneItStatus' );
 				var mwTitle = mw.config.get( 'wgRelevantPageName' );
@@ -369,7 +445,16 @@ var neayiinteractions_controller = ( function () {
 
 					var doers = mw.config.get( 'mwDoneItCount' );
 					mw.config.set('mwDoneItCount', doers + 1);	
-					
+
+					$('#tellUsMoreModalSubmit').on('click', function(e) {
+						// Call Insights with $('#tellUsMoreForm').serialize()
+
+						e.preventDefault();
+						$('#tellUsMoreModal').modal('hide');
+					});
+										
+					$('#tellUsMoreModal').modal('show');
+
 					self.setDoneItLabels();
 				}
 
@@ -380,6 +465,9 @@ var neayiinteractions_controller = ( function () {
 
 		setDoneItLabels: function( ) {
 			var doers = mw.config.get( 'mwDoneItCount' );
+
+			if (doers === null)
+				doers = 0;
 
 			if (doers < 2)
 				doers = doers + " exploitation";
