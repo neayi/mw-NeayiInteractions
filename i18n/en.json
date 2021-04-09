@@ -5,7 +5,7 @@
 			"Cindy Cicalese"
 		]
 	},
-	"commentstreams-desc": "Allows commenting on wiki pages",
+	"NeayiInteractions-desc": "Adds the Neayi interactions in wiki pages",
 	"commentstreams-error-prohibitedaction": "Action $1 is not allowed on comment pages.",
 	"commentstreams-error-comment-on-deleted-page": "The page with which this comment is associated has been deleted.",
 	"commentstreams-author-anonymous": "anonymous",

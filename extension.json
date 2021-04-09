@@ -2,7 +2,7 @@
 	"name": "NeayiInteractions",
 	"version": "1.0",
 	"author": [
-		"[https://www.mediawiki.org/wiki/User:BertrandGorge Berrtand Gorge]"
+		"[https://www.mediawiki.org/wiki/User:BertrandGorge Bertrand Gorge]"
 	],
 	"url": "https://www.mediawiki.org/wiki/Extension:NeayiInteractions",
 	"descriptionmsg": "NeayiInteractions-desc",
@@ -49,7 +49,7 @@
 
 	},
 	"Hooks": {
-		
+		"ParserFirstCallInit": "MediaWiki\\Extension\\NeayiInteractions\\NeayiInteractionsHooks::onParserSetup",
 		"BeforePageDisplay": "MediaWiki\\Extension\\NeayiInteractions\\NeayiInteractionsHooks::initializeJS"
 	},
 	"config": {

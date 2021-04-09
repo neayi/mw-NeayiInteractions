@@ -60,9 +60,7 @@ var neayiinteractions_controller = ( function () {
 			this.isLoggedIn = mw.config.get( 'wgUserName' ) !== null;
 			var config = mw.config.get( 'NeayiInteractions' );
 
-
-			mw.config.set('mwWatchedStatus', mw.config.get( 'NeayiInteractions' ).wgInitialWatchedStatus);
-			mw.config.set('mwWatchedCount', mw.config.get( 'NeayiInteractions' ).wgInitialWatchedCount);
+			mw.config.set('mwFollowedStatus', mw.config.get( 'NeayiInteractions' ).wgInitialFollowedStatus);
 
 			this.setupDivs();
 		},
@@ -143,243 +141,210 @@ var neayiinteractions_controller = ( function () {
 					</div>
 				</div>`).prependTo( '.contentHeader' );
 
-				// Modale - Connectez-vous
-				$(`<div class="modal fade" id="requiresLoginModal" tabindex="-1" aria-labelledby="requiresLoginModal" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content">
-							<div class="modal-header border-bottom-0">
-							<img width="200" src="/skins/skin-neayi/favicon/logo-triple-performance.svg" alt="Wiki Triple Performance">
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button>
-							</div>
-							<div class="modal-body">
-								<p>Connectez-vous ou créez un compte afin de rejoindre la communauté qui s'intéresse à ce sujet en particulier. Recevez
-								des notifications lors de nouveaux commentaires sur cette page, partagez votre expérience !</p>
+			// Modale - Connectez-vous
+			$(`<div class="modal fade" id="requiresLoginModal" tabindex="-1" aria-labelledby="requiresLoginModal" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header border-bottom-0">
+						<img width="200" src="/skins/skin-neayi/favicon/logo-triple-performance.svg" alt="Wiki Triple Performance">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						</div>
+						<div class="modal-body">
+							<p>Connectez-vous ou créez un compte afin de rejoindre la communauté qui s'intéresse à ce sujet en particulier. Recevez
+							des notifications lors de nouveaux commentaires sur cette page, partagez votre expérience !</p>
 
-								<p>Cette opération ne prend qu'une minute !</p>
-							</div>
-							<div class="modal-footer border-top-0">
-								<a class="btn btn-success" href="/index.php?title=Special:Login&returnto=${relevantPageName}">Créez un compte ou connectez-vous <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">arrow_forward</span></a>
-							</div>
+							<p>Cette opération ne prend qu'une minute !</p>
+						</div>
+						<div class="modal-footer border-top-0">
+							<a class="btn btn-success" href="/index.php?title=Special:Login&returnto=${relevantPageName}">Créez un compte ou connectez-vous <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">arrow_forward</span></a>
 						</div>
 					</div>
-				</div>`).appendTo( 'body' );
-				
-				// Modale - Connectez-vous (svp)
-				$(`<div class="modal fade" id="inviteLoginModal" tabindex="-1" aria-labelledby="requiresLoginModal" aria-hidden="true">
-					<div class="modal-dialog  modal-lg">
-						<div class="modal-content">
+				</div>
+			</div>`).appendTo( 'body' );
+			
+			// Modale - Connectez-vous (svp)
+			$(`<div class="modal fade" id="inviteLoginModal" tabindex="-1" aria-labelledby="requiresLoginModal" aria-hidden="true">
+				<div class="modal-dialog  modal-lg">
+					<div class="modal-content">
+						<div class="modal-header border-bottom-0">
+						<img width="200" src="/skins/skin-neayi/favicon/logo-triple-performance.svg" alt="Wiki Triple Performance">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						</div>
+						<div class="modal-body">
+							<p>Merci pour vos encouragements, ils sont appréciés par l'ensemble des membres de la communauté !</p>
+
+							<p>Connectez-vous ou créez un compte afin de nous rejoindre, pour pouvoir suivre les pages, commenter ou partager votre expérience !
+								(Cette opération ne prend qu'une minute !)</p>
+						</div>
+						<div class="modal-footer border-top-0">
+							<a class="text-primary not-yet-link" data-dismiss="modal" id="tellUsMoreModalDismiss" href="#">Non merci pas encore</a>
+							<a class="btn btn-success" href="/index.php?title=Special:Login&returnto=${relevantPageName}">Créez un compte ou connectez-vous <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">arrow_forward</span></a>
+						</div>
+					</div>
+				</div>
+			</div>`).appendTo( 'body' );
+
+			// Modale - Merci
+			$(`<div class="modal fade" id="tellUsMoreModal" tabindex="-1" data-backdrop="static" aria-labelledby="tellUsMoreModal" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<form id="tellUsMoreForm">
 							<div class="modal-header border-bottom-0">
-							<img width="200" src="/skins/skin-neayi/favicon/logo-triple-performance.svg" alt="Wiki Triple Performance">
+							<h1 class="border-bottom-0">Merci !</h1>
 							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 								<span aria-hidden="true">&times;</span>
 							</button>
 							</div>
 							<div class="modal-body">
-								<p>Merci pour vos encouragements, ils sont appréciés par l'ensemble des membres de la communauté !</p>
-
-								<p>Connectez-vous ou créez un compte afin de nous rejoindre, pour pouvoir suivre les pages, commenter ou partager votre expérience !
-								   (Cette opération ne prend qu'une minute !)</p>
+								<p>Dites en plus à la commauté pour enrichir vos échanges avec les autres agriculteurs</p>
+								<div class="row">
+									<div class="col form-group">
+										<label for="sinceInputId">Depuis quand ? <a href="#" role="button" class="badge badge-pill badge-light popover-neayi-help" data-toggle="popover" data-trigger="focus" title="Depuis quand ?" data-content="Renseignez l'année où vous avez démarré cette technique, afin d'aider les autres à comprendre votre degré d'expérience sur le sujet !">?</a></label>
+										<select class="form-control" id="sinceInputId" name="since"></select>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col form-check form-group">
+										<input class="" id="followwheck" name="follow" type="checkbox" checked value="follow">
+										<label class="form-check-label" for="followwheck">
+											Suivre la page ?
+										</label>
+									</div>
+								</div>
 							</div>
 							<div class="modal-footer border-top-0">
 								<a class="text-primary not-yet-link" data-dismiss="modal" id="tellUsMoreModalDismiss" href="#">Non merci pas encore</a>
-								<a class="btn btn-success" href="/index.php?title=Special:Login&returnto=${relevantPageName}">Créez un compte ou connectez-vous <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">arrow_forward</span></a>
+								<button class="btn btn-primary" id="tellUsMoreModalSubmit">Enregistrer</button>
 							</div>
-						</div>
+						</form>
 					</div>
-				</div>`).appendTo( 'body' );
+				</div>
+			</div>`).appendTo( 'body' );
+			
+			$(function () {
+				$('.popover-neayi-help').popover()
+			})
 
-				// Modale - Merci
-				$(`<div class="modal fade" id="tellUsMoreModal" tabindex="-1" data-backdrop="static" aria-labelledby="tellUsMoreModal" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content">
-							<form id="tellUsMoreForm">
-								<div class="modal-header border-bottom-0">
-								<h1 class="border-bottom-0">Merci !</h1>
-								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-								</div>
-								<div class="modal-body">
-									<p>Dites en plus à la commauté pour enrichir vos échanges avec les autres agriculteurs</p>
-									<div class="row">
-										<div class="col form-group">
-											<label for="sinceInputId">Depuis quand ? <a href="#" role="button" class="badge badge-pill badge-light popover-neayi-help" data-toggle="popover" data-trigger="focus" title="Depuis quand ?" data-content="Renseignez l'année où vous avez démarré cette technique, afin d'aider les autres à comprendre votre degré d'expérience sur le sujet !">?</a></label>
-											<select class="form-control" id="sinceInputId" name="since"></select>
-										</div>
-									</div>
-								</div>
-								<div class="modal-footer border-top-0">
-									<a class="text-primary not-yet-link" data-dismiss="modal" id="tellUsMoreModalDismiss" href="#">Non merci pas encore</a>
-									<button class="btn btn-primary" id="tellUsMoreModalSubmit">Enregistrer</button>
-								</div>
-							</form>
-						</div>
-					</div>
-				</div>`).appendTo( 'body' );
-				
-				$(function () {
-					$('.popover-neayi-help').popover()
-				})
+			const theYear = new Date();
+			for (let year = theYear.getFullYear(); year > 2004; year--) {
+				$( '#sinceInputId' ).append($('<option>', { 
+					value: year,
+					text : year 
+				}));
+			}
 
-				const theYear = new Date();
-				for (let year = theYear.getFullYear(); year > 2004; year--) {
-					$( '#sinceInputId' ).append($('<option>', { 
-						value: year,
-						text : year 
-					}));
-				}
+			var chameleonMenu = $( "#p-contentnavigation" ).parent();
+			$( "#p-contentnavigation" ).appendTo( "#neayi-interaction-mobile-menu" );
+			$( ".p-contentnavigation > div" ).removeAttr('id');
+			$( "#p-contentnavigation" ).removeAttr('id');
+			chameleonMenu.remove();
 
-				var chameleonMenu = $( "#p-contentnavigation" ).parent();
-				$( "#p-contentnavigation" ).appendTo( "#neayi-interaction-mobile-menu" );
-				$( ".p-contentnavigation > div" ).removeAttr('id');
-				$( "#p-contentnavigation" ).removeAttr('id');
-				chameleonMenu.remove();
+			$( '.comments-link' ).on( 'click', function () {
+				self.scrollToAnchor( 'cs-comments' );
+				window.location.hash = '#cs-comments';
+			} );
+			
+			this.setupFollowButton( $(" .neayi-interaction-suivre ") );
+			this.setupApplauseButton( $(" .neayi-interaction-applause ") );
+			this.setupDoneButton( $(" .neayi-interaction-doneit ") );
 
-				$( '.comments-link' ).on( 'click', function () {
-					self.scrollToAnchor( 'cs-comments' );
-					window.location.hash = '#cs-comments';
-				} );
-				
-				this.setWatch( $(" .neayi-interaction-suivre ") );
-				this.setWatchedLabels();
+			this.setupCommentsCountLabel( $( ".questions-text" ) );
 
-				this.setApplause( $(" .neayi-interaction-applause ") );
-				this.setApplauseLabels();
-
-				this.setDoneIt( $(" .neayi-interaction-doneit ") );
-				this.setDoneItLabels();
-
-				var CSConfig = mw.config.get( 'CommentStreams' );
-				if (CSConfig && CSConfig.comments && CSConfig.comments.length > 0)
-				{
-					var nbQuestionsAvecReponses = 0;
-					var parentIndex;
-
-					for ( parentIndex in CSConfig.comments ) {
-						var parentComment = CSConfig.comments[ parentIndex ];
-						if (parentComment.children)
-							nbQuestionsAvecReponses++;
-					}
-					
-					if (nbQuestionsAvecReponses == 1)
-						$( ".questions-text" ).text( "1 question avec réponses");
-					else if (nbQuestionsAvecReponses > 0)
-						$( ".questions-text" ).text( nbQuestionsAvecReponses + " questions avec réponses");
-					else if (CSConfig.comments.length == 1)
-						$( ".questions-text" ).text( "1 question");
-					else
-						$( ".questions-text" ).text( CSConfig.comments.length + " questions");
-				}
+			this.getInitialCounts();
 		},
 
 		/**
-		 * Sets the watch status on the buttons, and prepare the click event that'll trigger the watch API
-		 * 
-		 * @param jQuery buttons list buttons 
+		 * Get the initial counts from insights
 		 */
-		setWatch: function( buttons ) {
+		getInitialCounts: function() {
+			var self = this;
+			var sessionId = mw.config.get( 'NeayiInteractions' ).wgUserSessionId;
+			var pageId = mw.config.get( 'wgArticleId' );
+			$.ajax({
+				url: "https://insights.dev.tripleperformance.fr/api/user/page/"+pageId+"?wiki_session_id=" + sessionId,
+				dataType: 'json',
+				method: "GET"
+			  }).done(function(data) {
+				mw.config.set('mwInteractions', data);
+
+				self.setApplauseLabels();
+				self.setFollowersLabels();
+				self.setDoneItLabels();	
+		    });
+		},
+
+		hasApplaused: function() {
+			var interactions = mw.config.get( 'mwInteractions' );
+
+			if (interactions && interactions.state.applause)
+				return true;
+
+			return false;
+		},
+
+		hasFollowed: function() {
+			var followedStatus = mw.config.get( 'mwFollowedStatus' );
+
+			return followedStatus == true;
+		},
+
+		hasDone: function() {
+			var interactions = mw.config.get( 'mwInteractions' );
+
+			if (interactions && interactions.state.done)
+				return true;
+
+			return false;
+		},
+
+		ajaxInsights: function( actions, done_value = [] ) {
 			var self = this;
 
-			var bWatched = mw.config.get( 'mwWatchedStatus' );
-			if (bWatched)
-			{
-				buttons.html(`<span style="vertical-align: middle;">Suivi</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`);
-			}
-			else
-			{
-				buttons.text("Suivre");
-			}
+			var insightsURL = mw.config.get( 'NeayiInteractions' ).wgInsightsRootURL;
+			var apiToken = mw.config.get( 'NeayiInteractions' ).wgUserApiToken;
 
-			buttons.on( 'click', function ( e ) {
+			var sessionId = mw.user.sessionId();
+			var pageId = mw.config.get( 'wgArticleId' );
 
-				if (mw.user.isAnon()) {
-					$('#requiresLoginModal').modal('show')
-					return;
-				}
+			console.log("ajaxInsights", actions, done_value);
 
-				var bWatched = mw.config.get( 'mwWatchedStatus' );
-				var mwTitle = mw.config.get( 'wgRelevantPageName' );
+			$.ajax({
+				url: insightsURL + "api/page/"+pageId+"?wiki_session_id=" + sessionId,
+				dataType: 'json',
+				method: "POST",
+				data: {
+					interactions: actions,
+					done_value: done_value
+				},
+			}).done(function(data) {
+				mw.config.set('mwInteractions', data);
 
-				buttons.html(`<div class="spinner-border spinner-border-sm" role="status">
-								<span class="sr-only">Loading...</span>
-							</div>`);
-				buttons.prop("disabled", true);
-
-				if (bWatched)
-				{
-					new mw.Api().unwatch( mwTitle )
-						.done( function () {
-							buttons.text("Suivre");
-							mw.config.set('mwWatchedStatus', false);
-							buttons.prop("disabled", false);
-
-							var watchers = mw.config.get( 'mwWatchedCount' );
-							mw.config.set('mwWatchedCount', watchers - 1);
-
-							self.setWatchedLabels();
-						} )
-						.fail( function () {
-							buttons.html(`<span style="vertical-align: middle;">Suivi</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`);
-							buttons.prop("disabled", false);
-						} );
-				}
-				else
-				{
-					new mw.Api().watch( mwTitle )
-						.done( function () {
-							buttons.html(`<span style="vertical-align: middle;">Suivi</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`);
-							mw.config.set('mwWatchedStatus', true);
-							buttons.prop("disabled", false);
-
-							var watchers = mw.config.get( 'mwWatchedCount' );
-							mw.config.set('mwWatchedCount', watchers + 1);	
-							
-							self.setWatchedLabels();
-						} )
-						.fail( function () {
-							buttons.text("Suivre");
-							buttons.prop("disabled", false);
-						} );					
-				}
-
-				e.preventDefault();
-			} );
-		
+				self.setApplauseLabels();
+				self.setFollowersLabels();
+				self.setDoneItLabels();	
+			});
 		},
-
-		setWatchedLabels: function( ) {
-			var watchers = mw.config.get( 'mwWatchedCount' );
-
-			$(" .neayi-interaction-suivre-label ").text(watchers + " interessés");
-		},
-
 
 		/**
 		 * Prepare the click event that'll trigger the applause API
 		 * 
 		 * @param jQuery buttons list buttons 
 		 */
-		setApplause: function( buttons ) {
+		setupApplauseButton: function( buttons ) {
 			var self = this;
 
 			buttons.on( 'click', function ( e ) {
 
-				buttons.html(`<div class="spinner-border spinner-border-sm" role="status">
-								<span class="sr-only">Loading...</span>
-							</div>`);
-				buttons.prop("disabled", true);
+				self.disableButton(buttons);
 
-				// API Success
-				buttons.html(`<img src="${self.imagepath}clap.svg" width="28">`);
-				buttons.prop("disabled", false);
-
-				var applauses = mw.config.get( 'mwApplauseCount' );
-				mw.config.set('mwApplauseCount', applauses + 1);
-
-				self.setApplauseLabels();
-				// End API Success
+				if (self.hasApplaused())
+					self.ajaxInsights(['unapplause']);
+				else
+					self.ajaxInsights(['applause']);
 
 				e.preventDefault();
 
@@ -390,25 +355,60 @@ var neayiinteractions_controller = ( function () {
 			} );
 		
 		},
+
+
+		/**
+		 * Sets the watch status on the buttons, and prepare the click event that'll trigger the watch API
+		 * 
+		 * @param jQuery buttons list buttons 
+		 */
+		 setupFollowButton: function( buttons ) {
+			var self = this;
+
+			buttons.on( 'click', function ( e ) {
+				if (mw.user.isAnon()) {
+					$('#requiresLoginModal').modal('show')
+					return;
+				}
+
+				var mwTitle = mw.config.get( 'wgRelevantPageName' );
+				
+				self.disableButton(buttons);
+
+				if (self.hasFollowed())
+				{
+					new mw.Api().unwatch( mwTitle )
+						.done( function () {
+							mw.config.set('mwFollowedStatus', false);
+						} )
+						.fail( function () {
+						} );
+
+					self.ajaxInsights(['unfollow']);
+				}
+				else
+				{
+					new mw.Api().watch( mwTitle )
+						.done( function () {
+							mw.config.set('mwFollowedStatus', true);
+						} )
+						.fail( function () {
+						} );
+
+					self.ajaxInsights(['follow']);
+				}
+
+				e.preventDefault();
+			} );
 		
-
-		setApplauseLabels: function( ) {
-			var applauses = mw.config.get( 'mwApplauseCount' );
-
-			if (applauses >= 1000)
-				applauses = String(Math.round(applauses / 100) / 10) + " k";
-
-			$(" .neayi-interaction-applause-label ").text(applauses);
 		},
-
-
 
 		/**
 		 * Prepare the click event that'll trigger the Done API
 		 * 
 		 * @param jQuery buttons list buttons 
 		 */
-		 setDoneIt: function( buttons ) {
+		 setupDoneButton: function( buttons ) {
 			var self = this;
 
 			buttons.on( 'click', function ( e ) {
@@ -418,44 +418,36 @@ var neayiinteractions_controller = ( function () {
 					return;
 				}
 
-				var bDoneIt = mw.config.get( 'mwDoneItStatus' );
-				var mwTitle = mw.config.get( 'wgRelevantPageName' );
+				self.disableButton(buttons);
 
-				buttons.html(`<div class="spinner-border spinner-border-sm" role="status">
-								<span class="sr-only">Loading...</span>
-							</div>`);
-				buttons.prop("disabled", true);
-
-				if (bDoneIt)
+				if (self.hasDone())
 				{
-					buttons.text("Je le fais");
 					mw.config.set('mwDoneItStatus', false);
 					buttons.prop("disabled", false);
 
-					var doers = mw.config.get( 'mwDoneItCount' );
-					mw.config.set('mwDoneItCount', doers - 1);
-
-					self.setDoneItLabels();
+					self.ajaxInsights(['undone']);
 				}
 				else
 				{
-					buttons.html(`<span style="vertical-align: middle;">Fait !</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">beenhere</span>`);
 					mw.config.set('mwDoneItStatus', true);
 					buttons.prop("disabled", false);
 
-					var doers = mw.config.get( 'mwDoneItCount' );
-					mw.config.set('mwDoneItCount', doers + 1);	
-
 					$('#tellUsMoreModalSubmit').on('click', function(e) {
-						// Call Insights with $('#tellUsMoreForm').serialize()
+						var actions = ['done'];
+						if ($('#followwheck').val() == "follow")
+							actions = ['done', 'follow'];
+
+						var otherparams = {};
+						otherparams.start_at = $('#sinceInputId').val() + "-01-01";
+
+						self.ajaxInsights(actions, otherparams);
 
 						e.preventDefault();
 						$('#tellUsMoreModal').modal('hide');
 					});
-										
-					$('#tellUsMoreModal').modal('show');
 
-					self.setDoneItLabels();
+					self.ajaxInsights(['done']);
+					$('#tellUsMoreModal').modal('show');
 				}
 
 				e.preventDefault();
@@ -463,11 +455,67 @@ var neayiinteractions_controller = ( function () {
 		
 		},
 
-		setDoneItLabels: function( ) {
-			var doers = mw.config.get( 'mwDoneItCount' );
+		setupCommentsCountLabel: function(label) {
 
-			if (doers === null)
-				doers = 0;
+			var CSConfig = mw.config.get( 'CommentStreams' );
+			if (CSConfig && CSConfig.comments && CSConfig.comments.length > 0)
+			{
+				var nbQuestionsAvecReponses = 0;
+				var parentIndex;
+
+				for ( parentIndex in CSConfig.comments ) {
+					var parentComment = CSConfig.comments[ parentIndex ];
+					if (parentComment.children)
+						nbQuestionsAvecReponses++;
+				}
+				
+				if (nbQuestionsAvecReponses == 1)
+					label.text( "1 question avec réponses");
+				else if (nbQuestionsAvecReponses > 0)
+					label.text( nbQuestionsAvecReponses + " questions avec réponses");
+				else if (CSConfig.comments.length == 1)
+					label.text( "1 question");
+				else
+					label.text( CSConfig.comments.length + " questions");
+			}
+		},
+
+		setApplauseLabels: function( ) {
+			var self = this;
+			
+			var applauses = 0;
+			var interactions = mw.config.get( 'mwInteractions' );
+
+			if (interactions && interactions.state.applause)
+				applauses = interactions.counts.applause;
+
+			if (applauses >= 1000)
+				applauses = String(Math.round(applauses / 100) / 10) + " k";
+
+			$( '.neayi-interaction-applause' ).html(`<img src="${self.imagepath}clap.svg" width="28">`).prop("disabled", false);
+			$( '.neayi-interaction-applause-label' ).text(applauses);
+		},
+
+		setFollowersLabels: function( ) {
+			var followers = 0;
+			var interactions = mw.config.get( 'mwInteractions' );
+
+			if (interactions && interactions.state.follow)
+				followers = interactions.counts.applause;
+
+			$( ".neayi-interaction-suivre-label" ).text(followers + " interessés");
+
+			if (this.hasFollowed())
+				$( ".neayi-interaction-suivre" ).html(`<span style="vertical-align: middle;">Suivi</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`).prop("disabled", false);
+			else
+				$( ".neayi-interaction-suivre" ).text("Suivre").prop("disabled", false);
+		},
+
+		setDoneItLabels: function( ) {
+			var doers = 0;
+			var interactions = mw.config.get( 'mwInteractions' );
+			if (interactions && interactions.state.done)
+				doers = interactions.counts.done;
 
 			if (doers < 2)
 				doers = doers + " exploitation";
@@ -476,8 +524,21 @@ var neayiinteractions_controller = ( function () {
 			else
 				doers = doers + " exploitations";
 
-			$(" .neayi-interaction-doneit-label ").text(doers);
-		}		
+			$( ".neayi-interaction-doneit-label" ).text(doers);
+
+			if (this.hasDone())
+				$( ".neayi-interaction-doneit" ).html(`<span style="vertical-align: middle;">Fait !</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">beenhere</span>`).prop("disabled", false);
+			else
+				$( ".neayi-interaction-doneit" ).text("Je le fais").prop("disabled", false);
+		},
+		
+		disableButton: function(buttons) {
+			buttons.html(`<div class="spinner-border spinner-border-sm" role="status">
+							<span class="sr-only">Loading...</span>
+						 </div>`);
+			buttons.prop("disabled", true);			
+		}
+
 		
 	};
 }() );

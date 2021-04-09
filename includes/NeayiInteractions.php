@@ -37,7 +37,7 @@ class NeayiInteractions {
 	const INTERACTIONS_INHERITED = 0;
 
 	// no NeayiInteractions flag
-	private $areCommentsEnabled = self::INTERACTIONS_INHERITED;
+	private $areInteractionsEnabled = self::INTERACTIONS_INHERITED;
 
 	/**
 	 * create a NeayiInteractions singleton instance
@@ -52,17 +52,12 @@ class NeayiInteractions {
 	}
 
 	/**
-	 * enables the display of comments on the current page
-	 */
-	public function enableCommentsOnPage() {
-		$this->areCommentsEnabled = self::INTERACTIONS_ENABLED;
-	}
-
-	/**
 	 * disables the display of comments on the current page
+	 * 
+	 * Called on hook <no-neayi-interactions/> or <no-comment-streams/>
 	 */
-	public function disableCommentsOnPage() {
-		$this->areCommentsEnabled = self::INTERACTIONS_DISABLED;
+	public function disableInteractionsOnPage() {
+		$this->areInteractionsEnabled = self::INTERACTIONS_DISABLED;
 	}
 
 	/**
@@ -84,7 +79,7 @@ class NeayiInteractions {
 	 */
 	private function checkDisplayComments( $output ) {
 		// don't display comments on this page if they are explicitly disabled
-		if ( $this->areCommentsEnabled === self::INTERACTIONS_DISABLED ) {
+		if ( $this->areInteractionsEnabled === self::INTERACTIONS_DISABLED ) {
 			return false;
 		}
 
@@ -106,7 +101,7 @@ class NeayiInteractions {
 		}
 
 		// display comments on this page if they are explicitly enabled
-		if ( $this->areCommentsEnabled === self::INTERACTIONS_ENABLED ) {
+		if ( $this->areInteractionsEnabled === self::INTERACTIONS_ENABLED ) {
 			return true;
 		}
 
@@ -151,18 +146,44 @@ class NeayiInteractions {
 			$namespace = MWNamespace::getSubject( $namespace );
 		}
 
-		$commentStreamsParams = [];
-
+		$neayiInteractionsParams = [];
+		
+		$neayiInteractionsParams[ 'wgUserApiToken' ] = '';
 		$user = $output->getUser();
 		if ( !$user->isAnon() ) {
-			$commentStreamsParams[ 'wgInitialWatchedStatus' ] = $user->isWatched( $title );
+			$neayiInteractionsParams[ 'wgInitialFollowedStatus' ] = $user->isWatched( $title );
+			$neayiInteractionsParams[ 'wgUserApiToken' ] = self::getNeayiApiToken( $user );
 		}
+		$neayiInteractionsParams[ 'wgUserSessionId' ] = $_COOKIE['wikimwuser-sessionId'];
 
 		$store = MediaWikiServices::getInstance()->getWatchedItemStore();
-		$commentStreamsParams[ 'wgInitialWatchedCount' ] = $store->countWatchers( $title );
+		$neayiInteractionsParams[ 'wgInitialFollowedCount' ] = $store->countWatchers( $title );
+		$neayiInteractionsParams[ 'wgInsightsRootURL' ] = $GLOBALS['wgInsightsRootURL'];
 
-		$output->addJsConfigVars( 'NeayiInteractions', $commentStreamsParams );
+		$output->addJsConfigVars( 'NeayiInteractions', $neayiInteractionsParams );
 		$output->addModules( 'ext.NeayiInteractions' );
 	}
+	
 
+	/** 
+	 * Cache the GUIDs for Users
+	 */
+	private static function getNeayiApiToken( $user )
+	{
+		$dbr = wfGetDB(DB_REPLICA);
+		$result = $dbr->selectRow(
+			'neayiauth_users',
+			[
+				'neayiauth_external_apitoken'
+			],
+			[
+				'neayiauth_user' => $user->mId
+			],
+			__METHOD__
+		);
+		if ( $result )
+			return (string)$result->neayiauth_external_apitoken;
+			
+		return '';
+	}	
 }

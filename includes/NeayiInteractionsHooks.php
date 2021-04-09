@@ -60,4 +60,40 @@ class NeayiInteractionsHooks {
 		return true;
 	}
 
+
+
+	/**
+	 * Implements ParserFirstCallInit hook.
+	 * See https://www.mediawiki.org/wiki/Manual:Hooks/ParserFirstCallInit
+	 * Adds comment-streams, no-comment-streams, and
+	 * comment-streams-initially-collapsed magic words.
+	 *
+	 * @param Parser $parser the parser
+	 * @return bool continue checking hooks
+	 */
+	public static function onParserSetup( Parser $parser ) {
+
+		$parser->setHook( 'no-neayi-interactions',
+			'MediaWiki\Extension\NeayiInteractions\NeayiInteractionsHooks::disableNeayiInteractions' );
+						
+		return true;
+	}
+
+	/**
+	 * Implements tag function, <no-comment-streams/>, which disables
+	 * NeayiInteractions on a page.
+	 *
+	 * @param string $input input between the tags (ignored)
+	 * @param array $args tag arguments
+	 * @param Parser $parser the parser
+	 * @param PPFrame $frame the parent frame
+	 * @return string to replace tag with
+	 */
+	public static function disableNeayiInteractions( $input, array $args, Parser $parser, PPFrame $frame ) {
+		$parser->getOutput()->updateCacheExpiry( 0 );
+		$cs = NeayiInteractions::singleton();
+		$cs->disableInteractionsOnPage();
+		return "";
+	}
+
 }

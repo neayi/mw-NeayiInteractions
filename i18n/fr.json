@@ -7,7 +7,7 @@
 			"Wladek92"
 		]
 	},
-	"commentstreams-desc": "Permet de commenter les pages wiki",
+	"NeayiInteractions-desc": "Ajoute le bloc d'interaction Neayi dans les pages wiki",
 	"commentstreams-error-prohibitedaction": "L’action $1 n’est pas permise sur les pages de commentaire.",
 	"commentstreams-error-comment-on-deleted-page": "La page à laquelle ce commentaire est associé a été supprimée.",
 	"commentstreams-author-anonymous": "anonyme",
