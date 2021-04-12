@@ -319,7 +319,7 @@ var neayiinteractions_controller = ( function () {
 				data: {
 					interactions: actions,
 					done_value: done_value
-				},
+				}
 			}).done(function(data) {
 				mw.config.set('mwInteractions', data);
 
