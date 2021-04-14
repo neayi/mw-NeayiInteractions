@@ -319,6 +319,9 @@ var neayiinteractions_controller = ( function () {
 				data: {
 					interactions: actions,
 					done_value: done_value
+				},
+				headers: {
+					'Authorization': 'Basic ' + apiToken
 				}
 			}).done(function(data) {
 				mw.config.set('mwInteractions', data);
