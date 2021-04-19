@@ -74,41 +74,9 @@ var neayiinteractions_controller = ( function () {
 			var self = this;
 			var pageTitle = mw.config.get('wgTitle');
 			var relevantPageName = mw.config.get( 'wgRelevantPageName' );
-
-			// Desktop bloc is added at the top/right of the page, in the margin
-			$(`<div class="interaction-bloc">
-					<div class="interaction-top">
-						${pageTitle}
-				
-						<div class="container px-0 interaction-buttons">
-							<div class="row mx-n1">
-								<div class="col-auto px-1">
-									<button class="btn btn-dark-green text-white neayi-interaction-applause" type="button">
-										<img src="${this.imagepath}clap.svg" width="28">
-									</button>
-									<br><span class="neayi-interaction-applause-label">1,2 k</span>
-								</div>
-								<div class="col px-1"><button class="w-100 btn btn-dark-green text-white neayi-interaction-suivre" type="button">Suivre -</button><br><span class="neayi-interaction-suivre-label">350 intéressés</span></div>
-								<div class="col px-1"><button class="w-100 btn btn-dark-green text-white neayi-interaction-doneit" type="button">Je le fais</button><br><span class="neayi-interaction-doneit-label">25 exploitations</span></div>
-				
-							</div>
-						</div>
-					</div>
-					<div class="container px-0 interaction-links">
-						<div class="row mx-n1">
-							<div class="col px-1"><a class="w-100 btn btn-dark-green button comments-link" href="#cs-comments">
-									<span class="material-icons mr-1 align-middle" aria-hidden="true">arrow_downward</span>
-									<span class="questions-text">Poser une question</span></a></div>
-							<div class="col-auto pr-1 pl-0 dropdown" id="neayi-interaction-desktop-menu">
-								<button class="menu btn btn-dark-green" type="button" data-toggle="dropdown" data-boundary="viewport" aria-haspopup="true" aria-expanded="false">
-									<span class="material-icons" aria-hidden="true">more_vert</span>
-								</button>
-							</div>
-				
-						</div>
-					</div>
-				</div>`).appendTo( '.rightSide' );
 			
+			$( "#interaction-title" ).text(pageTitle);
+
 			$( "#p-contentnavigation" ).clone( true ).appendTo( "#neayi-interaction-desktop-menu" );
 
 			// Mobile bloc is added at the top of the page
@@ -264,10 +232,15 @@ var neayiinteractions_controller = ( function () {
 			var self = this;
 			var sessionId = mw.config.get( 'NeayiInteractions' ).wgUserSessionId;
 			var pageId = mw.config.get( 'wgArticleId' );
+			var apiToken = mw.config.get( 'NeayiInteractions' ).wgUserApiToken;
+
 			$.ajax({
 				url: "https://insights.dev.tripleperformance.fr/api/user/page/"+pageId+"?wiki_session_id=" + sessionId,
 				dataType: 'json',
-				method: "GET"
+				method: "GET",				
+				headers: {
+					'Authorization': 'Bearer ' + apiToken
+				}
 			  }).done(function(data) {
 				mw.config.set('mwInteractions', data);
 
@@ -321,7 +294,7 @@ var neayiinteractions_controller = ( function () {
 					done_value: done_value
 				},
 				headers: {
-					'Authorization': 'Basic ' + apiToken
+					'Authorization': 'Bearer ' + apiToken
 				}
 			}).done(function(data) {
 				mw.config.set('mwInteractions', data);
@@ -489,7 +462,7 @@ var neayiinteractions_controller = ( function () {
 			var applauses = 0;
 			var interactions = mw.config.get( 'mwInteractions' );
 
-			if (interactions && interactions.state.applause)
+			if (interactions && interactions.counts.applause)
 				applauses = interactions.counts.applause;
 
 			if (applauses >= 1000)
@@ -503,7 +476,7 @@ var neayiinteractions_controller = ( function () {
 			var followers = 0;
 			var interactions = mw.config.get( 'mwInteractions' );
 
-			if (interactions && interactions.state.follow)
+			if (interactions && interactions.counts.follow)
 				followers = interactions.counts.applause;
 
 			$( ".neayi-interaction-suivre-label" ).text(followers + " interessés");
@@ -517,7 +490,7 @@ var neayiinteractions_controller = ( function () {
 		setDoneItLabels: function( ) {
 			var doers = 0;
 			var interactions = mw.config.get( 'mwInteractions' );
-			if (interactions && interactions.state.done)
+			if (interactions && interactions.counts.done)
 				doers = interactions.counts.done;
 
 			if (doers < 2)
