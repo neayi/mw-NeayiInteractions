@@ -123,14 +123,15 @@ var neayiinteractions_controller = ( function () {
 			var self = this;
 			var sessionId = mw.config.get( 'NeayiInteractions' ).wgUserSessionId;
 			var pageId = mw.config.get( 'wgArticleId' );
+			var insightsURL = mw.config.get( 'NeayiInteractions' ).wgInsightsRootURL;
+
 			var apiToken = mw.config.get( 'NeayiInteractions' ).wgUserApiToken;
 			var headers = {};
-
 			if (apiToken != '')
 				headers.Authorization = 'Bearer ' + apiToken;
 
 			$.ajax({
-				url: "https://insights.dev.tripleperformance.fr/api/user/page/"+pageId+"?wiki_session_id=" + sessionId,
+				url: insightsURL + "api/user/page/"+pageId+"?wiki_session_id=" + sessionId,
 				dataType: 'json',
 				method: "GET",				
 				headers: headers
