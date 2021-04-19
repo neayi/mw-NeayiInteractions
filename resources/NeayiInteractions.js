@@ -126,7 +126,7 @@ var neayiinteractions_controller = ( function () {
 							<p>Cette opération ne prend qu'une minute !</p>
 						</div>
 						<div class="modal-footer border-top-0">
-							<a class="btn btn-success" href="/index.php?title=Special:Login&returnto=${relevantPageName}">Créez un compte ou connectez-vous <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">arrow_forward</span></a>
+							<a class="btn btn-primary" href="/index.php?title=Special:Login&returnto=${relevantPageName}">Créez un compte ou connectez-vous <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">arrow_forward</span></a>
 						</div>
 					</div>
 				</div>
@@ -150,7 +150,7 @@ var neayiinteractions_controller = ( function () {
 						</div>
 						<div class="modal-footer border-top-0">
 							<a class="text-primary not-yet-link" data-dismiss="modal" id="tellUsMoreModalDismiss" href="#">Non merci pas encore</a>
-							<a class="btn btn-success" href="/index.php?title=Special:Login&returnto=${relevantPageName}">Créez un compte ou connectez-vous <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">arrow_forward</span></a>
+							<a class="btn btn-primary" href="/index.php?title=Special:Login&returnto=${relevantPageName}">Créez un compte ou connectez-vous <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">arrow_forward</span></a>
 						</div>
 					</div>
 				</div>
