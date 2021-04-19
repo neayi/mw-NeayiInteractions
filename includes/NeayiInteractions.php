@@ -154,7 +154,7 @@ class NeayiInteractions {
 			$neayiInteractionsParams[ 'wgInitialFollowedStatus' ] = $user->isWatched( $title );
 			$neayiInteractionsParams[ 'wgUserApiToken' ] = self::getNeayiApiToken( $user );
 		}
-		$neayiInteractionsParams[ 'wgUserSessionId' ] = $_COOKIE['wikimwuser-sessionId'];
+		$neayiInteractionsParams[ 'wgUserSessionId' ] = $_COOKIE[$GLOBALS['wgDBname'] . 'mwuser-sessionId'];
 
 		$store = MediaWikiServices::getInstance()->getWatchedItemStore();
 		$neayiInteractionsParams[ 'wgInitialFollowedCount' ] = $store->countWatchers( $title );
