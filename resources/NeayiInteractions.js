@@ -20,7 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-var neayiinteractions_controller = ( function () {
+var neayiinteractions_controller = (function () {
 	'use strict';
 
 	return {
@@ -46,106 +46,110 @@ var neayiinteractions_controller = ( function () {
 			left: '50%' // Left position relative to parent
 		},
 		initialize: function () {
-			this.baseUrl = window.location.href.split( /[?#]/ )[ 0 ];
-			this.imagepath = mw.config.get( 'wgExtensionAssetsPath' ) +
+			this.baseUrl = window.location.href.split(/[?#]/)[0];
+			this.imagepath = mw.config.get('wgExtensionAssetsPath') +
 				'/NeayiInteractions/images/';
-			if ( window.location.hash ) {
-				var hash = window.location.hash.substring( 1 );
-				var queryIndex = hash.indexOf( '?' );
-				if ( queryIndex !== -1 ) {
-					hash = hash.substring( 0, queryIndex );
+			if (window.location.hash) {
+				var hash = window.location.hash.substring(1);
+				var queryIndex = hash.indexOf('?');
+				if (queryIndex !== -1) {
+					hash = hash.substring(0, queryIndex);
 				}
 				this.targetComment = hash;
 			}
-			this.isLoggedIn = mw.config.get( 'wgUserName' ) !== null;
-			var config = mw.config.get( 'NeayiInteractions' );
+			this.isLoggedIn = mw.config.get('wgUserName') !== null;
+			var config = mw.config.get('NeayiInteractions');
 
-			mw.config.set('mwFollowedStatus', mw.config.get( 'NeayiInteractions' ).wgInitialFollowedStatus);
+			mw.config.set('mwFollowedStatus', mw.config.get('NeayiInteractions').wgInitialFollowedStatus);
 
 			this.setupDivs();
 		},
-		scrollToAnchor: function ( id ) {
-			var element = $( '#' + id );
-			if ( element.length ) {
-				$( 'html,body' ).animate( { scrollTop: element.offset().top - 50 }, 'slow' );
+		scrollToAnchor: function (id) {
+			var element = $('#' + id);
+			if (element.length) {
+				$('html,body').animate({ scrollTop: element.offset().top - 50 }, 'slow');
 			}
 		},
 		setupDivs: function () {
 			var self = this;
 			var pageTitle = mw.config.get('wgTitle');
-			var relevantPageName = mw.config.get( 'wgRelevantPageName' );
-			
-			$( "#interaction-title" ).text(pageTitle);
+			var relevantPageName = mw.config.get('wgRelevantPageName');
 
-			$( "#p-contentnavigation" ).clone( true ).appendTo( "#neayi-interaction-desktop-menu" );
+			$("#interaction-title").text(pageTitle);
 
-			// Mobile bloc is added at the top of the page
-			//$(``).prependTo( '.contentHeader' );
-			
-			$( 'a.login-links' ).attr('href', '/index.php?title=Special:Login&returnto=' + relevantPageName);
-			
-			$(function () {
-				$('.popover-neayi-help').popover()
-			})
+			// Copy the page menu in the new interaction bloc on the right
+			$("#p-contentnavigation").clone(true).appendTo("#neayi-interaction-desktop-menu").removeAttr('id');
 
-			const theYear = new Date();
-			for (let year = theYear.getFullYear(); year > 2004; year--) {
-				$( '#sinceInputId' ).append($('<option>', { 
-					value: year,
-					text : year 
-				}));
-			}
-
-			var chameleonMenu = $( "#p-contentnavigation" ).parent();
-			$( "#p-contentnavigation" ).appendTo( "#neayi-interaction-mobile-menu" );
-			$( ".p-contentnavigation > div" ).removeAttr('id');
-			$( "#p-contentnavigation" ).removeAttr('id');
+			// Move the original menu in the mobile version of the interaction bloc. Since we now have a copy of this
+			// menu, we will remove all the IDs from the children divs, in order to avoir dupplicate IDs.
+			// The clone (in the interaction block on the right) will keep its IDs.
+			var chameleonMenu = $("#p-contentnavigation").parent();
+			$("#p-contentnavigation").appendTo("#neayi-interaction-mobile-menu");
+			$("#p-contentnavigation > div").removeAttr('id');
 			chameleonMenu.remove();
 
-			$( '.comments-link' ).on( 'click', function () {
-				self.scrollToAnchor( 'cs-comments' );
-				window.location.hash = '#cs-comments';
-			} );
-			
-			this.setupFollowButton( $(" .neayi-interaction-suivre ") );
-			this.setupApplauseButton( $(" .neayi-interaction-applause ") );
-			this.setupDoneButton( $(" .neayi-interaction-doneit ") );
+			// Fix the login/create account links
+			$('a.login-links').attr('href', '/index.php?title=Special:Login&returnto=' + relevantPageName);
 
-			this.setupCommentsCountLabel( $( ".questions-text" ) );
+			// Check if comments are enabled on the page. If not, we disable all interactions.
+			var CSConfig = mw.config.get('CommentStreams');
+			if (!CSConfig) {
+				$('.comments-link').text('').prop('disabled', true);
+				$('.interaction-buttons').hide();
+			}
+			else {
+				// Enable the popover on the question marks in the modals
+				$('.popover-neayi-help').popover()
 
-			this.getInitialCounts();
+				// Create the dropdown list in the "Je l'ai fait" modal
+				const theYear = new Date();
+				for (let year = theYear.getFullYear(); year > 2004; year--) {
+					$('#sinceInputId').append($('<option>', {
+						value: year,
+						text: year
+					}));
+				}
+				// Add events on the buttons to trigger the modals and API calls
+				this.setupFollowButton($(" .neayi-interaction-suivre "));
+				this.setupApplauseButton($(" .neayi-interaction-applause "));
+				this.setupDoneButton($(" .neayi-interaction-doneit "));
+
+				this.setupCommentsButton();
+
+				this.getInitialCounts();
+			}
 		},
 
 		/**
 		 * Get the initial counts from insights
 		 */
-		getInitialCounts: function() {
+		getInitialCounts: function () {
 			var self = this;
-			var sessionId = mw.config.get( 'NeayiInteractions' ).wgUserSessionId;
-			var pageId = mw.config.get( 'wgArticleId' );
-			var insightsURL = mw.config.get( 'NeayiInteractions' ).wgInsightsRootURL;
+			var sessionId = mw.config.get('NeayiInteractions').wgUserSessionId;
+			var pageId = mw.config.get('wgArticleId');
+			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
 
-			var apiToken = mw.config.get( 'NeayiInteractions' ).wgUserApiToken;
+			var apiToken = mw.config.get('NeayiInteractions').wgUserApiToken;
 			var headers = {};
 			if (apiToken != '')
 				headers.Authorization = 'Bearer ' + apiToken;
 
 			$.ajax({
-				url: insightsURL + "api/user/page/"+pageId+"?wiki_session_id=" + sessionId,
+				url: insightsURL + "api/user/page/" + pageId + "?wiki_session_id=" + sessionId,
 				dataType: 'json',
-				method: "GET",				
+				method: "GET",
 				headers: headers
-			  }).done(function(data) {
+			}).done(function (data) {
 				mw.config.set('mwInteractions', data);
 
 				self.setApplauseLabels();
 				self.setFollowersLabels();
-				self.setDoneItLabels();	
-		    });
+				self.setDoneItLabels();
+			});
 		},
 
-		hasApplaused: function() {
-			var interactions = mw.config.get( 'mwInteractions' );
+		hasApplaused: function () {
+			var interactions = mw.config.get('mwInteractions');
 
 			if (interactions && interactions.state.applause)
 				return true;
@@ -153,14 +157,14 @@ var neayiinteractions_controller = ( function () {
 			return false;
 		},
 
-		hasFollowed: function() {
-			var followedStatus = mw.config.get( 'mwFollowedStatus' );
+		hasFollowed: function () {
+			var followedStatus = mw.config.get('mwFollowedStatus');
 
 			return followedStatus == true;
 		},
 
-		hasDone: function() {
-			var interactions = mw.config.get( 'mwInteractions' );
+		hasDone: function () {
+			var interactions = mw.config.get('mwInteractions');
 
 			if (interactions && interactions.state.done)
 				return true;
@@ -168,21 +172,21 @@ var neayiinteractions_controller = ( function () {
 			return false;
 		},
 
-		ajaxInsights: function( actions, done_value = [] ) {
+		ajaxInsights: function (actions, done_value = []) {
 			var self = this;
 
-			var insightsURL = mw.config.get( 'NeayiInteractions' ).wgInsightsRootURL;
+			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
 
 			var sessionId = mw.user.sessionId();
-			var pageId = mw.config.get( 'wgArticleId' );
+			var pageId = mw.config.get('wgArticleId');
 
 			var headers = {};
-			var apiToken = mw.config.get( 'NeayiInteractions' ).wgUserApiToken;
+			var apiToken = mw.config.get('NeayiInteractions').wgUserApiToken;
 			if (apiToken != '')
 				headers.Authorization = 'Bearer ' + apiToken;
 
 			$.ajax({
-				url: insightsURL + "api/page/"+pageId+"?wiki_session_id=" + sessionId,
+				url: insightsURL + "api/page/" + pageId + "?wiki_session_id=" + sessionId,
 				dataType: 'json',
 				method: "POST",
 				data: {
@@ -190,12 +194,12 @@ var neayiinteractions_controller = ( function () {
 					done_value: done_value
 				},
 				headers: headers
-			}).done(function(data) {
+			}).done(function (data) {
 				mw.config.set('mwInteractions', data);
 
 				self.setApplauseLabels();
 				self.setFollowersLabels();
-				self.setDoneItLabels();	
+				self.setDoneItLabels();
 			});
 		},
 
@@ -204,10 +208,10 @@ var neayiinteractions_controller = ( function () {
 		 * 
 		 * @param jQuery buttons list buttons 
 		 */
-		setupApplauseButton: function( buttons ) {
+		setupApplauseButton: function (buttons) {
 			var self = this;
 
-			buttons.on( 'click', function ( e ) {
+			buttons.on('click', function (e) {
 
 				self.disableButton(buttons);
 
@@ -221,9 +225,9 @@ var neayiinteractions_controller = ( function () {
 				if (mw.user.isAnon()) {
 					$('#inviteLoginModal').modal('show')
 					return;
-				}				
-			} );
-		
+				}
+			});
+
 		},
 
 
@@ -232,45 +236,43 @@ var neayiinteractions_controller = ( function () {
 		 * 
 		 * @param jQuery buttons list buttons 
 		 */
-		 setupFollowButton: function( buttons ) {
+		setupFollowButton: function (buttons) {
 			var self = this;
 
-			buttons.on( 'click', function ( e ) {
+			buttons.on('click', function (e) {
 				if (mw.user.isAnon()) {
 					$('#requiresLoginModal').modal('show')
 					return;
 				}
 
-				var mwTitle = mw.config.get( 'wgRelevantPageName' );
-				
+				var mwTitle = mw.config.get('wgRelevantPageName');
+
 				self.disableButton(buttons);
 
-				if (self.hasFollowed())
-				{
-					new mw.Api().unwatch( mwTitle )
-						.done( function () {
+				if (self.hasFollowed()) {
+					new mw.Api().unwatch(mwTitle)
+						.done(function () {
 							mw.config.set('mwFollowedStatus', false);
-						} )
-						.fail( function () {
-						} );
+						})
+						.fail(function () {
+						});
 
 					self.ajaxInsights(['unfollow']);
 				}
-				else
-				{
-					new mw.Api().watch( mwTitle )
-						.done( function () {
+				else {
+					new mw.Api().watch(mwTitle)
+						.done(function () {
 							mw.config.set('mwFollowedStatus', true);
-						} )
-						.fail( function () {
-						} );
+						})
+						.fail(function () {
+						});
 
 					self.ajaxInsights(['follow']);
 				}
 
 				e.preventDefault();
-			} );
-		
+			});
+
 		},
 
 		/**
@@ -278,11 +280,11 @@ var neayiinteractions_controller = ( function () {
 		 * 
 		 * @param jQuery buttons list buttons 
 		 */
-		 setupDoneButton: function( buttons ) {
+		setupDoneButton: function (buttons) {
 			var self = this;
 
-			buttons.on( 'click', function ( e ) {
-				
+			buttons.on('click', function (e) {
+
 				if (mw.user.isAnon()) {
 					$('#requiresLoginModal').modal('show')
 					return;
@@ -290,19 +292,17 @@ var neayiinteractions_controller = ( function () {
 
 				self.disableButton(buttons);
 
-				if (self.hasDone())
-				{
+				if (self.hasDone()) {
 					mw.config.set('mwDoneItStatus', false);
 					buttons.prop("disabled", false);
 
 					self.ajaxInsights(['undone']);
 				}
-				else
-				{
+				else {
 					mw.config.set('mwDoneItStatus', true);
 					buttons.prop("disabled", false);
 
-					$('#tellUsMoreModalSubmit').on('click', function(e) {
+					$('#tellUsMoreModalSubmit').on('click', function (e) {
 						var actions = ['done'];
 						if ($('#followwheck').val() == "follow")
 							actions = ['done', 'follow'];
@@ -321,40 +321,58 @@ var neayiinteractions_controller = ( function () {
 				}
 
 				e.preventDefault();
-			} );
-		
+			});
+
 		},
 
-		setupCommentsCountLabel: function(label) {
+		/**
+		 * Enable and add an event on the comments button, if the comments are enabled on the page
+		 * Set the label with the number of existing comments
+		 */
+		setupCommentsButton: function () {
+			var CSConfig = mw.config.get('CommentStreams');
 
-			var CSConfig = mw.config.get( 'CommentStreams' );
-			if (CSConfig && CSConfig.comments && CSConfig.comments.length > 0)
-			{
+			if (!CSConfig) {
+				$('.comments-link').text('').prop('disabled', true);
+				return;
+			}
+
+			if (CSConfig.comments && CSConfig.comments.length > 0) {
+				// When we click on the "N questions" link, we scroll down the page to the comments.
+				// Todo: if comments are disabled on the page, we should remove this interaction!
+				$('.comments-link').on('click', function () {
+					self.scrollToAnchor('cs-comments');
+					window.location.hash = '#cs-comments';
+				});
+
+				// Now change the label
 				var nbQuestionsAvecReponses = 0;
 				var parentIndex;
 
-				for ( parentIndex in CSConfig.comments ) {
-					var parentComment = CSConfig.comments[ parentIndex ];
+				for (parentIndex in CSConfig.comments) {
+					var parentComment = CSConfig.comments[parentIndex];
 					if (parentComment.children)
 						nbQuestionsAvecReponses++;
 				}
-				
+
+				var label = $(".questions-text");
+
 				if (nbQuestionsAvecReponses == 1)
-					label.text( "1 question avec réponses");
+					label.text("1 question avec réponses");
 				else if (nbQuestionsAvecReponses > 0)
-					label.text( nbQuestionsAvecReponses + " questions avec réponses");
+					label.text(nbQuestionsAvecReponses + " questions avec réponses");
 				else if (CSConfig.comments.length == 1)
-					label.text( "1 question");
+					label.text("1 question");
 				else
-					label.text( CSConfig.comments.length + " questions");
+					label.text(CSConfig.comments.length + " questions");
 			}
 		},
 
-		setApplauseLabels: function( ) {
+		setApplauseLabels: function () {
 			var self = this;
-			
+
 			var applauses = 0;
-			var interactions = mw.config.get( 'mwInteractions' );
+			var interactions = mw.config.get('mwInteractions');
 
 			if (interactions && interactions.counts.applause)
 				applauses = interactions.counts.applause;
@@ -362,28 +380,28 @@ var neayiinteractions_controller = ( function () {
 			if (applauses >= 1000)
 				applauses = String(Math.round(applauses / 100) / 10) + " k";
 
-			$( '.neayi-interaction-applause' ).html(`<img src="${self.imagepath}clap.svg" width="28">`).prop("disabled", false);
-			$( '.neayi-interaction-applause-label' ).text(applauses);
+			$('.neayi-interaction-applause').html(`<img src="${self.imagepath}clap.svg" width="28">`).prop("disabled", false);
+			$('.neayi-interaction-applause-label').text(applauses);
 		},
 
-		setFollowersLabels: function( ) {
+		setFollowersLabels: function () {
 			var followers = 0;
-			var interactions = mw.config.get( 'mwInteractions' );
+			var interactions = mw.config.get('mwInteractions');
 
 			if (interactions && interactions.counts.follow)
 				followers = interactions.counts.applause;
 
-			$( ".neayi-interaction-suivre-label" ).text(followers + " interessés");
+			$(".neayi-interaction-suivre-label").text(followers + " interessés");
 
 			if (this.hasFollowed())
-				$( ".neayi-interaction-suivre" ).html(`<span style="vertical-align: middle;">Suivi</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`).prop("disabled", false);
+				$(".neayi-interaction-suivre").html(`<span style="vertical-align: middle;">Suivi</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`).prop("disabled", false);
 			else
-				$( ".neayi-interaction-suivre" ).text("Suivre").prop("disabled", false);
+				$(".neayi-interaction-suivre").text("Suivre").prop("disabled", false);
 		},
 
-		setDoneItLabels: function( ) {
+		setDoneItLabels: function () {
 			var doers = 0;
-			var interactions = mw.config.get( 'mwInteractions' );
+			var interactions = mw.config.get('mwInteractions');
 			if (interactions && interactions.counts.done)
 				doers = interactions.counts.done;
 
@@ -394,36 +412,36 @@ var neayiinteractions_controller = ( function () {
 			else
 				doers = doers + " exploitations";
 
-			$( ".neayi-interaction-doneit-label" ).text(doers);
+			$(".neayi-interaction-doneit-label").text(doers);
 
 			if (this.hasDone())
-				$( ".neayi-interaction-doneit" ).html(`<span style="vertical-align: middle;">Fait !</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">beenhere</span>`).prop("disabled", false);
+				$(".neayi-interaction-doneit").html(`<span style="vertical-align: middle;">Fait !</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">beenhere</span>`).prop("disabled", false);
 			else
-				$( ".neayi-interaction-doneit" ).text("Je le fais").prop("disabled", false);
+				$(".neayi-interaction-doneit").text("Je le fais").prop("disabled", false);
 		},
-		
-		disableButton: function(buttons) {
+
+		disableButton: function (buttons) {
 			buttons.html(`<div class="spinner-border spinner-border-sm" role="status">
 							<span class="sr-only">Loading...</span>
 						 </div>`);
-			buttons.prop("disabled", true);			
+			buttons.prop("disabled", true);
 		}
 
-		
+
 	};
-}() );
+}());
 
 window.NeayiInteractionsController = neayiinteractions_controller;
 
-( function () {
-	$( document )
-		.ready( function () {
-			if ( mw.config.exists( 'NeayiInteractions' ) ) {
+(function () {
+	$(document)
+		.ready(function () {
+			if (mw.config.exists('NeayiInteractions')) {
 				window.NeayiInteractionsController.initialize();
 			}
 
 			// Also add a scrollspy on the TOC
-			$('body').scrollspy({ target: '#toc', 'offset': 0});
-		} );
-}() );
+			$('body').scrollspy({ target: '#toc', 'offset': 0 });
+		});
+}());
 

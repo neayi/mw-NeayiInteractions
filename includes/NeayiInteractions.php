@@ -90,11 +90,6 @@ class NeayiInteractions {
 
 		$title = $output->getTitle();
 
-		// don't display comments on pages that do not exist
-		if ( !$title->exists() ) {
-			return false;
-		}
-
 		// don't display comments on redirect pages
 		if ( $title->isRedirect() ) {
 			return false;
@@ -141,10 +136,6 @@ class NeayiInteractions {
 		// determine if comments should be initially collapsed or expanded
 		// if the namespace is a talk namespace, use state of its subject namespace
 		$title = $output->getTitle();
-		$namespace = $title->getNamespace();
-		if ( $title->isTalkPage() ) {
-			$namespace = MWNamespace::getSubject( $namespace );
-		}
 
 		$neayiInteractionsParams = [];
 		
