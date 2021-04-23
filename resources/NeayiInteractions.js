@@ -389,7 +389,7 @@ var neayiinteractions_controller = (function () {
 			var interactions = mw.config.get('mwInteractions');
 
 			if (interactions && interactions.counts.follow)
-				followers = interactions.counts.applause;
+				followers = interactions.counts.follow;
 
 			$(".neayi-interaction-suivre-label").text(followers + " interessés");
 
@@ -439,9 +439,6 @@ window.NeayiInteractionsController = neayiinteractions_controller;
 			if (mw.config.exists('NeayiInteractions')) {
 				window.NeayiInteractionsController.initialize();
 			}
-
-			// Also add a scrollspy on the TOC
-			$('body').scrollspy({ target: '#toc', 'offset': 0 });
 		});
 }());
 
