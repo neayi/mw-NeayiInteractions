@@ -151,10 +151,37 @@ class NeayiInteractions {
 		$neayiInteractionsParams[ 'wgInitialFollowedCount' ] = $store->countWatchers( $title );
 		$neayiInteractionsParams[ 'wgInsightsRootURL' ] = $GLOBALS['wgInsightsRootURL'];
 
+		$user = $output->getUser();
+		if ($user->isAnon())
+			$neayiInteractionsParams['wgUserGuid'] = '';
+		else
+			$neayiInteractionsParams['wgUserGuid'] = $this->getNeayiGuid($user);
+
 		$output->addJsConfigVars( 'NeayiInteractions', $neayiInteractionsParams );
 		$output->addModules( 'ext.NeayiInteractions' );
 	}
-	
+
+	/**
+	 * Get the GUIDs for Users
+	 */
+	private function getNeayiGUID( $user )
+	{
+		$dbr = wfGetDB(DB_REPLICA);
+		$result = $dbr->selectRow(
+			'neayiauth_users',
+			[
+				'neayiauth_external_userid'
+			],
+			[
+				'neayiauth_user' => $user->mId
+			],
+			__METHOD__
+		);
+		if ( $result )
+			return (string)$result->neayiauth_external_userid;
+
+		return '';
+	}
 
 	/** 
 	 * Cache the GUIDs for Users

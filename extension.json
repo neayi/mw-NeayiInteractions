@@ -20,11 +20,13 @@
 	"ResourceModules": {
 		"ext.NeayiInteractions": {
 			"styles": [
-				"NeayiInteractions.css"
+				"NeayiInteractions.css",
+				"colorbrewer.css"
 			],
 			"scripts": [
 				"NeayiInteractionsQuerier.js",
-				"NeayiInteractions.js"
+				"NeayiInteractions.js",
+				"d3.v5.min.js"
 			],
 			"dependencies": [
 				"oojs-ui"
