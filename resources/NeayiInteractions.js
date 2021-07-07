@@ -688,7 +688,7 @@ var neayiinteractions_controller = (function () {
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
 
 			characteristicsStats.slice(0, 5).forEach(function (e, i) {
-				$( divId + " .stats-icons" )
+				$( divId + ' .stats-icons' )
 					.append( $(`<div class="caracteristique-exploitation">
 									<div>
 										<div><a href="#" data-guid="` + e.uuid + `" data-type="` + e.type + `" title="` + e.page_label + `"><img alt="` + e.page_label + `" src="`+insightsURL + 'api/icon/' + e.uuid+`/90"></a></div>
