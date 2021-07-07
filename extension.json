@@ -19,17 +19,11 @@
 	},
 	"ResourceModules": {
 		"ext.NeayiInteractions": {
-			"styles": [
-				"NeayiInteractions.css",
-				"colorbrewer.css"
-			],
 			"scripts": [
-				"NeayiInteractionsQuerier.js",
-				"NeayiInteractions.js",
-				"d3.v5.min.js"
+				"NeayiInteractions.js"
 			],
 			"dependencies": [
-				"oojs-ui"
+				"ext.d3.core"
 			],
 			"targets": [
 				"desktop",
@@ -37,6 +31,14 @@
 			],
 			"messages": [
 				"NeayiInteractions-buttontext-Neayi-permalink"
+			]
+		},
+		"ext.d3.core": {
+			"styles": [
+				"colorbrewer.css"
+			],
+			"scripts": [
+				"d3.v5.min.js"
 			]
 		}
 	},

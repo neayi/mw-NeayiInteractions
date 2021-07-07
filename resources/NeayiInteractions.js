@@ -80,17 +80,17 @@ var neayiinteractions_controller = (function () {
 			var pageTitle = mw.config.get('wgTitle');
 			var relevantPageName = mw.config.get('wgRelevantPageName');
 
-			$("#interaction-title").text(pageTitle);
+			$('#interaction-title').text(pageTitle);
 
 			// Copy the page menu in the new interaction bloc on the right
-			$("#p-contentnavigation").clone(true).appendTo("#neayi-interaction-desktop-menu").removeAttr('id');
+			$('#p-contentnavigation').clone(true).appendTo("#neayi-interaction-desktop-menu").removeAttr('id');
 
 			// Move the original menu in the mobile version of the interaction bloc. Since we now have a copy of this
 			// menu, we will remove all the IDs from the children divs, in order to avoir dupplicate IDs.
 			// The clone (in the interaction block on the right) will keep its IDs.
-			var chameleonMenu = $("#p-contentnavigation").parent();
-			$("#p-contentnavigation").appendTo("#neayi-interaction-mobile-menu");
-			$("#p-contentnavigation > div").removeAttr('id');
+			var chameleonMenu = $('#p-contentnavigation').parent();
+			$('#p-contentnavigation').appendTo("#neayi-interaction-mobile-menu");
+			$('#p-contentnavigation > div').removeAttr('id');
 			chameleonMenu.remove();
 
 			// Fix the login/create account links
@@ -117,22 +117,22 @@ var neayiinteractions_controller = (function () {
 				}
 
 				// Add events on the buttons to trigger the modals and API calls
-				this.setupFollowButton($(" .neayi-interaction-suivre "));
-				this.setupApplauseButton($(" .neayi-interaction-applause "));
-				this.setupDoneButton($(" .neayi-interaction-doneit "));
+				this.setupFollowButton($('.neayi-interaction-suivre'));
+				this.setupApplauseButton($('.neayi-interaction-applause'));
+				this.setupDoneButton($('.neayi-interaction-doneit'));
 
 				this.setupCommentsButton();
 			}
 
-			$( "#load-more-community").on('click', function (e) {
+			$( '#load-more-community' ).on('click', function (e) {
 
 				e.preventDefault();
-				$( "#load-more-community").prop("disabled", true);
+				$( '#load-more-community' ).prop("disabled", true);
 
-				self.loadCommunity($( "#load-more-community").attr('href'));
+				self.loadCommunity($( '#load-more-community' ).attr('href'));
 			});
 
-			$("#communityModal").scroll(function(){
+			$( '#communityModal' ).scroll(function(){
 				var scrollMoreButton = $('#load-more-community');
 
 				if (!scrollMoreButton.is(":visible") || scrollMoreButton.prop("disabled"))
@@ -141,8 +141,8 @@ var neayiinteractions_controller = (function () {
 				if (scrollMoreButton.offset().top < window.innerHeight)
 				{
 					// Load another page
-					$( "#load-more-community").prop("disabled", true);
-					self.loadCommunity($( "#load-more-community").attr('href'));
+					$( '#load-more-community' ).prop("disabled", true);
+					self.loadCommunity($( '#load-more-community' ).attr('href'));
 				}
 			});
 
@@ -230,11 +230,11 @@ var neayiinteractions_controller = (function () {
 				if (data.current_page != data.last_page)
 				{
 					rootURL = rootURL.replace(/&page=[0-9]+/, '') + '&page=' + (parseInt(data.current_page, 10) + 1);
-					$( "#load-more-community").prop("disabled", false).show().attr('href', rootURL);
+					$( '#load-more-community' ).prop("disabled", false).show().attr('href', rootURL);
 				}
 				else
 				{
-					$( "#load-more-community").hide().attr('href', '');
+					$( '#load-more-community' ).hide().attr('href', '');
 				}
 			});
 		},
@@ -465,7 +465,7 @@ var neayiinteractions_controller = (function () {
 						nbQuestionsAvecReponses++;
 				}
 
-				var label = $(".questions-text");
+				var label = $( '.questions-text' );
 
 				if (nbQuestionsAvecReponses == 1)
 					label.text("1 question avec réponses");
@@ -501,12 +501,12 @@ var neayiinteractions_controller = (function () {
 			if (interactions && interactions.counts.follow)
 				followers = interactions.counts.follow;
 
-			$(".neayi-interaction-suivre-label").text(followers + " interessés");
+			$( '.neayi-interaction-suivre-label' ).text(followers + " interessés");
 
 			if (this.hasFollowed())
-				$(".neayi-interaction-suivre").html(`<span style="vertical-align: middle;">Suivi</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`).prop("disabled", false);
+				$( '.neayi-interaction-suivre' ).html(`<span style="vertical-align: middle;">Suivi</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`).prop("disabled", false);
 			else
-				$(".neayi-interaction-suivre").text("Suivre").prop("disabled", false);
+				$( '.neayi-interaction-suivre' ).text("Suivre").prop("disabled", false);
 		},
 
 		setDoneItLabels: function () {
@@ -522,12 +522,12 @@ var neayiinteractions_controller = (function () {
 			else
 				doers = doers + " exploitations";
 
-			$(".neayi-interaction-doneit-label").text(doers);
+			$( '.neayi-interaction-doneit-label' ).text(doers);
 
 			if (this.hasDone())
-				$(".neayi-interaction-doneit").html(`<span style="vertical-align: middle;">Fait !</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">beenhere</span>`).prop("disabled", false);
+				$( '.neayi-interaction-doneit' ).html(`<span style="vertical-align: middle;">Fait !</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">beenhere</span>`).prop("disabled", false);
 			else
-				$(".neayi-interaction-doneit").text("Je le fais").prop("disabled", false);
+				$( '.neayi-interaction-doneit' ).text("Je le fais").prop("disabled", false);
 		},
 
 		disableButton: function (buttons) {
@@ -566,11 +566,11 @@ var neayiinteractions_controller = (function () {
 			self.setupCharacteristicsStats('#famings-stats', data.characteristics.farming);
 			self.setupCharacteristicsStats('#cropping-systems-stats', data.characteristics.croppingSystem);
 
-			$('#communityModal').modal('handleUpdate');
+			$( '#communityModal' ).modal('handleUpdate');
 		},
 
 		addOptionToSelect: function (selectId, label, value) {
-			$('#'+selectId).append($("<option>").attr("value", value).text(label));
+			$('#'+selectId).append($( '<option>' ).attr("value", value).text(label));
 		},
 
 		/**
@@ -634,10 +634,10 @@ var neayiinteractions_controller = (function () {
 					features.append(self.makeFeature(element['caption'], element['page'], element['icon']));
 				});
 
-				$( "#community-items" ).append(userdiv);
+				$( '#community-items' ).append(userdiv);
 			});
 
-			$('#communityModal').modal('handleUpdate');
+			$( '#communityModal' ).modal('handleUpdate');
 		},
 
 		makeFeature: function(caption, page, imageURL = '') {
@@ -665,17 +665,17 @@ var neayiinteractions_controller = (function () {
 			  });
 
 			deptStats.slice(0, 5).forEach(function (e, i) {
-				$( "#departments-stats" )
+				$( '#departments-stats' )
 					.append( $(`<div class="dept-stat"><a href="#" data-dept="`+e.department+`"><span class="count">x ` + e.count + `</span><span class="dept-name">` + e.departmentData.pretty_page_label + `</span></a></div>`) );
 			});
 
-			$( "#departments-stats a" ).on('click', function (e) {
+			$( '#departments-stats a' ).on('click', function (e) {
 				e.preventDefault();
 
-				$('#commununity-tab').tab('show');
+				$( '#commununity-tab' ).tab('show');
 
 				var dept = $(this).data('dept');
-				$("#departments-select").val(dept).change();
+				$( '#departments-select' ).val(dept).change();
 			});
 		},
 
@@ -698,21 +698,21 @@ var neayiinteractions_controller = (function () {
 								</div>`) );
 			});
 
-			$( ".stats-icons a" ).on('click', function (e) {
+			$( '.stats-icons a' ).on('click', function (e) {
 				e.preventDefault();
 
-				$('#commununity-tab').tab('show');
+				$( '#commununity-tab' ).tab('show');
 
 				var guid = $(this).data('guid');
 				var type = $(this).data('type');
 
 				switch (type) {
 					case 'croppingSystem':
-						$("#cropping-systems-select").val(guid).change();
+						$( '#cropping-systems-select' ).val(guid).change();
 						break;
 
 					case 'farming':
-						$("#famings-select").val(guid).change();
+						$( '#famings-select' ).val(guid).change();
 						break;
 
 					default:
@@ -726,7 +726,6 @@ var neayiinteractions_controller = (function () {
 		 * @param {*} deptStats
 		 */
 		setupMap: function(deptStats) {
-
 			const width = 300, height = 270;
 			const path = d3.geoPath();
 			const projection = d3.geoConicConformal() // Lambert-93
@@ -735,13 +734,13 @@ var neayiinteractions_controller = (function () {
 				.translate([width / 2, height / 2]);
 			path.projection(projection);
 
-			const svg = d3.select('#map').append("svg")
-				.attr("id", "svg")
-				.attr("width", width)
-				.attr("height", height)
-				.attr("class", "Greens");
+			const svg = d3.select('#map').append('svg')
+				.attr('id', 'svg')
+				.attr('width', width)
+				.attr('height', height)
+				.attr('class', 'Greens');
 
-			const deps = svg.append("g");
+			const deps = svg.append('g');
 
 			var promises = [];
 			promises.push(d3.json('/extensions/NeayiInteractions/resources/departments.json'));
@@ -750,12 +749,12 @@ var neayiinteractions_controller = (function () {
 				const geojson = values[0]; // Récupération de la première promesse : le contenu du fichier JSON
 
 				var features = deps
-					.selectAll("path")
+					.selectAll('path')
 					.data(geojson.features)
 					.enter()
-					.append("path")
-					.attr('id', d => "d" + d.properties.CODE_DEPT)
-					.attr("d", path);
+					.append('path')
+					.attr('id', d => 'd' + d.properties.CODE_DEPT)
+					.attr('d', path);
 
 				// On calcule le max de la population pour adapter les couleurs
 				var quantile = d3.scaleQuantile()
@@ -764,33 +763,33 @@ var neayiinteractions_controller = (function () {
 
 				deptStats.forEach(function (e, i) {
 
-					d3.select("#d" + e.department)
-						.attr("class", d => "department q" + quantile(+e.count) + "-9")
-						.on("mouseover", function (d) {
+					d3.select('#d' + e.department)
+						.attr('class', d => 'department q' + quantile(+e.count) + '-9')
+						.on('mouseover', function (d) {
 							div.transition()
 								.duration(200)
-								.style("opacity", 1);
-							div.html("<b>Département : </b>" + e.departmentData.pretty_page_label + "<br>"
-								+ "<b>Population : </b>" + e.count + "<br>")
-								.style("left", (d3.event.pageX + 30) + "px")
-								.style("top", (d3.event.pageY - 30) + "px");
+								.style('opacity', 1);
+							div.html('<b>Département : </b>' + e.departmentData.pretty_page_label + '<br>'
+								+ '<b>Population : </b>' + e.count + '<br>')
+								.style('left', (d3.event.pageX + 30) + 'px')
+								.style('top', (d3.event.pageY - 30) + 'px');
 						})
-						.on("mouseout", function (d) {
-							div.style("opacity", 0);
-							div.html("")
-								.style("left", "-500px")
-								.style("top", "-500px");
+						.on('mouseout', function (d) {
+							div.style('opacity', 0);
+							div.html('')
+								.style('left', '-500px')
+								.style('top', '-500px');
 						})
 						.on('click', function (d) {
 							$('#commununity-tab').tab('show');
-							$("#departments-select").val(e.department).change();
+							$('#departments-select').val(e.department).change();
 						});
 				});
 			});
 
-			var div = d3.select("body").append("div")
-				.attr("class", "tooltip")
-				.style("opacity", 0);
+			var div = d3.select('body').append('div')
+				.attr('class', 'tooltip')
+				.style('opacity', 0);
 		}
 
 	};
