@@ -63,6 +63,11 @@ var neayiinteractions_controller = (function () {
 			mw.config.set('mwFollowedStatus', mw.config.get('NeayiInteractions').wgInitialFollowedStatus);
 
 			this.setupDivs();
+
+			this.getInitialCounts();
+
+			this.loadStats();
+			this.loadCommunity('');
 		},
 		scrollToAnchor: function (id) {
 			var element = $('#' + id);
@@ -96,6 +101,7 @@ var neayiinteractions_controller = (function () {
 			if (!CSConfig) {
 				$('.comments-link').text('').prop('disabled', true);
 				$('.interaction-buttons').hide();
+				$('.interaction-links').hide();
 			}
 			else {
 				// Enable the popover on the question marks in the modals
@@ -109,15 +115,45 @@ var neayiinteractions_controller = (function () {
 						text: year
 					}));
 				}
+
 				// Add events on the buttons to trigger the modals and API calls
 				this.setupFollowButton($(" .neayi-interaction-suivre "));
 				this.setupApplauseButton($(" .neayi-interaction-applause "));
 				this.setupDoneButton($(" .neayi-interaction-doneit "));
 
 				this.setupCommentsButton();
-
-				this.getInitialCounts();
 			}
+
+			$( "#load-more-community").on('click', function (e) {
+
+				e.preventDefault();
+				$( "#load-more-community").prop("disabled", true);
+
+				self.loadCommunity($( "#load-more-community").attr('href'));
+			});
+
+			$("#communityModal").scroll(function(){
+				var scrollMoreButton = $('#load-more-community');
+
+				if (!scrollMoreButton.is(":visible") || scrollMoreButton.prop("disabled"))
+					return;
+
+				if (scrollMoreButton.offset().top < window.innerHeight)
+				{
+					// Load another page
+					$( "#load-more-community").prop("disabled", true);
+					self.loadCommunity($( "#load-more-community").attr('href'));
+				}
+			});
+
+			$('select.community-select').on('change', function() {
+				self.loadCommunity();
+			  });
+
+			$('#community-doneit-only').on('change', function() {
+				self.loadCommunity();
+			  });
+
 		},
 
 		/**
@@ -145,6 +181,80 @@ var neayiinteractions_controller = (function () {
 				self.setApplauseLabels();
 				self.setFollowersLabels();
 				self.setDoneItLabels();
+			});
+		},
+
+		/**
+		 * Load the community from insights
+		 */
+		loadCommunity: function (url = '') {
+			var self = this;
+			var pageId = mw.config.get('wgArticleId');
+			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
+
+			// https://insights.dev.tripleperformance.fr/api/page/4282/followers?type=do
+			// Parameters: type: do | follow, cp, farming_id, cropping_id
+			var rootURL = url;
+			var bReset = false;
+
+			if (rootURL == '')
+			{
+				bReset = true;
+
+				var typeOfFollowers = 'follow';
+				if ($('#community-doneit-only').prop('checked'))
+					typeOfFollowers = "do";
+
+				var dept = '';
+				if ($('#departments-select').val())
+					dept = '&dept=' + $('#departments-select').val();
+
+				var farming_id = '';
+				if ($('#famings-select').val())
+					farming_id = '&farming_id=' + $('#famings-select').val();
+
+				var cropping_id = '';
+				if ($('#cropping-systems-select').val())
+					cropping_id = '&cropping_id=' + $('#cropping-systems-select').val();
+
+				rootURL = insightsURL + "api/page/" + pageId + "/followers?type=" + typeOfFollowers + dept + farming_id + cropping_id;
+			}
+
+			$.ajax({
+				url: rootURL,
+				dataType: 'json',
+				method: "GET"
+			}).done(function (data) {
+				self.addCommunityPage(data.data, bReset);
+
+				if (data.current_page != data.last_page)
+				{
+					rootURL = rootURL.replace(/&page=[0-9]+/, '') + '&page=' + (parseInt(data.current_page, 10) + 1);
+					$( "#load-more-community").prop("disabled", false).show().attr('href', rootURL);
+				}
+				else
+				{
+					$( "#load-more-community").hide().attr('href', '');
+				}
+			});
+		},
+
+		/**
+		 * Load the stats from insights
+		 */
+		 loadStats: function () {
+			var self = this;
+			var pageId = mw.config.get('wgArticleId');
+			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
+
+			// https://insights.dev.tripleperformance.fr/api/page/4282/stats
+
+			$.ajax({
+				url: insightsURL + "api/page/" + pageId + "/stats",
+				dataType: 'json',
+				method: "GET"
+			}).done(function (data) {
+				self.setStats(data);
 			});
 		},
 
@@ -425,8 +535,263 @@ var neayiinteractions_controller = (function () {
 							<span class="sr-only">Loading...</span>
 						 </div>`);
 			buttons.prop("disabled", true);
-		}
+		},
 
+		/**
+		 * Parses the result of the ajax call and display the result
+		 * @param {*} data
+		 */
+		 setStats: function (data) {
+
+			var self = this;
+
+			data.department.forEach(item => {
+
+				if (!item.departmentData)
+					return;
+
+				self.addOptionToSelect('departments-select', item.departmentData.pretty_page_label + ' (' + item.count + ')', item.department);
+			});
+
+			// Add the productions
+			data.characteristics.farming.forEach(item => {
+				self.addOptionToSelect('famings-select', item.pretty_page_label + ' (' + item.count + ')', item.uuid);
+			});
+			data.characteristics.croppingSystem.forEach(item => {
+				self.addOptionToSelect('cropping-systems-select', item.pretty_page_label + ' (' + item.count + ')', item.uuid);
+			});
+
+			self.setupDepartmentsStats(data.department);
+			self.setupMap(data.department);
+			self.setupCharacteristicsStats('#famings-stats', data.characteristics.farming);
+			self.setupCharacteristicsStats('#cropping-systems-stats', data.characteristics.croppingSystem);
+
+			$('#communityModal').modal('handleUpdate');
+		},
+
+		addOptionToSelect: function (selectId, label, value) {
+			$('#'+selectId).append($("<option>").attr("value", value).text(label));
+		},
+
+		/**
+		 * Parses the result of the ajax call and display the result
+		 * @param {*} data
+		 */
+		addCommunityPage: function (data, bReset) {
+
+			var self = this;
+
+			if (bReset)
+				$('#community-items').html('');
+
+			var connectedUserGUID = mw.config.get('NeayiInteractions').wgUserGuid;
+
+			data.forEach(user => {
+
+				if (user['structure'] != '')
+					user['structure'] = ' (<a href="/wiki/Structure:'+user['structure']+'">'+user['structure']+'</a>)';
+
+				if (user['hasDone'] == 0)
+					user['hasDone'] = '<span class="status">Le suit</span>';
+				else if (user['hasDone'] == 1)
+					user['hasDone'] = '<span class="status">Le fait</span>';
+				else
+					user['hasDone'] = '<span class="status">Le fait depuis ' + user['hasDone'].substring(0, 4) + '</span>';
+
+				var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
+
+				var profileURL = insightsURL + 'tp/' + encodeURI(user['fullname']) +'/' + user['userGuid'];
+				if (connectedUserGUID == user['userGuid'])
+					profileURL = insightsURL + 'profile';
+
+				var userdiv = $(`<div class="follower-item d-flex flex-wrap">
+								<div class="follower-item-avatar"><img
+										src="` + insightsURL + `api/user/avatar/` + user['userGuid'] + `/100">
+								</div>
+								<div class="follower-item-user">
+									<div class="follower-item-username"><a
+											href="` + profileURL + `">` + user['fullname'] + `</a> ` + user['hasDone'] + `</div>
+									<div class="follower-item-usertitle">` + user['sector'] + user['structure'] + `</div>
+								</div>
+								<div class="follower-item-features flex-fill">
+									<div class="d-flex flex-wrap justify-content-start caracteristiques-exploitation"></div>
+								</div>
+							</div>`);
+
+				var features = userdiv.find( "div.caracteristiques-exploitation" );
+
+				// Add the department
+				var depName = user['characteristicsDepartement'][0].page;
+				var depIcon = user['characteristicsDepartement'][0].icon;
+				features.append(self.makeFeature(depName, 'Département ' + user['department'], depIcon));
+
+				// Add the productions
+				user['productions'].forEach(element => {
+					features.append(self.makeFeature(element['caption'], element['page'], element['icon']));
+				});
+
+				user['characteristics'].forEach(element => {
+					features.append(self.makeFeature(element['caption'], element['page'], element['icon']));
+				});
+
+				$( "#community-items" ).append(userdiv);
+			});
+
+			$('#communityModal').modal('handleUpdate');
+		},
+
+		makeFeature: function(caption, page, imageURL = '') {
+
+			if (imageURL != '')
+			{
+				// Make sure the Icon URL ends with /60 for the right width
+				if (!imageURL.match(/\/60/))
+					imageURL = imageURL + '/60';
+
+				return $( `<div class="caracteristique-exploitation"><p>
+											<a href="/wiki/` + page + `" title="` + page + `"><img alt="` + page + `" src="` + imageURL + `" width="60" height="60"></a>
+											<span><a href="/wiki/` + page + `" title="` + page + `">` + caption + `</a></span>
+										</p></div>`);
+			}
+			else
+				return $( `<div class="caracteristique-exploitation"><p>
+										<span><a href="/wiki/` + page + `" title="` + page + `">` + caption + `</a></span>
+									</p></div>`);
+		},
+
+		setupDepartmentsStats: function(deptStats) {
+			deptStats.sort(function(a, b) {
+				return b.count - a.count;
+			  });
+
+			deptStats.slice(0, 5).forEach(function (e, i) {
+				$( "#departments-stats" )
+					.append( $(`<div class="dept-stat"><a href="#" data-dept="`+e.department+`"><span class="count">x ` + e.count + `</span><span class="dept-name">` + e.departmentData.pretty_page_label + `</span></a></div>`) );
+			});
+
+			$( "#departments-stats a" ).on('click', function (e) {
+				e.preventDefault();
+
+				$('#commununity-tab').tab('show');
+
+				var dept = $(this).data('dept');
+				$("#departments-select").val(dept).change();
+			});
+		},
+
+		setupCharacteristicsStats: function(divId, characteristicsStats) {
+
+			characteristicsStats.sort(function(a, b) {
+				return b.count - a.count;
+			  });
+
+			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
+
+			characteristicsStats.slice(0, 5).forEach(function (e, i) {
+				$( divId + " .stats-icons" )
+					.append( $(`<div class="caracteristique-exploitation">
+									<div>
+										<div><a href="#" data-guid="` + e.uuid + `" data-type="` + e.type + `" title="` + e.page_label + `"><img alt="` + e.page_label + `" src="`+insightsURL + 'api/icon/' + e.uuid+`/90"></a></div>
+										<div class="label"><a href="#" data-guid="` + e.uuid + `" data-type="` + e.type + `" title="` + e.page_label + `">` + e.pretty_page_label + `</a></div>
+									</div>
+									<div class="caracteristique-stat">x ` + e.count + `</div>
+								</div>`) );
+			});
+
+			$( ".stats-icons a" ).on('click', function (e) {
+				e.preventDefault();
+
+				$('#commununity-tab').tab('show');
+
+				var guid = $(this).data('guid');
+				var type = $(this).data('type');
+
+				switch (type) {
+					case 'croppingSystem':
+						$("#cropping-systems-select").val(guid).change();
+						break;
+
+					case 'farming':
+						$("#famings-select").val(guid).change();
+						break;
+
+					default:
+						break;
+				}
+			});
+		},
+
+		/**
+		 * Setup the d3js map as inspired from https://www.datavis.fr/index.php?page=map-population
+		 * @param {*} deptStats
+		 */
+		setupMap: function(deptStats) {
+
+			const width = 300, height = 270;
+			const path = d3.geoPath();
+			const projection = d3.geoConicConformal() // Lambert-93
+				.center([2.454071, 46.279229]) // Center on France
+				.scale(1500)
+				.translate([width / 2, height / 2]);
+			path.projection(projection);
+
+			const svg = d3.select('#map').append("svg")
+				.attr("id", "svg")
+				.attr("width", width)
+				.attr("height", height)
+				.attr("class", "Greens");
+
+			const deps = svg.append("g");
+
+			var promises = [];
+			promises.push(d3.json('/extensions/NeayiInteractions/resources/departments.json'));
+
+			Promise.all(promises).then(function (values) {
+				const geojson = values[0]; // Récupération de la première promesse : le contenu du fichier JSON
+
+				var features = deps
+					.selectAll("path")
+					.data(geojson.features)
+					.enter()
+					.append("path")
+					.attr('id', d => "d" + d.properties.CODE_DEPT)
+					.attr("d", path);
+
+				// On calcule le max de la population pour adapter les couleurs
+				var quantile = d3.scaleQuantile()
+					.domain([0, d3.max(deptStats, e => +e.count)])
+					.range(d3.range(9));
+
+				deptStats.forEach(function (e, i) {
+
+					d3.select("#d" + e.department)
+						.attr("class", d => "department q" + quantile(+e.count) + "-9")
+						.on("mouseover", function (d) {
+							div.transition()
+								.duration(200)
+								.style("opacity", 1);
+							div.html("<b>Département : </b>" + e.departmentData.pretty_page_label + "<br>"
+								+ "<b>Population : </b>" + e.count + "<br>")
+								.style("left", (d3.event.pageX + 30) + "px")
+								.style("top", (d3.event.pageY - 30) + "px");
+						})
+						.on("mouseout", function (d) {
+							div.style("opacity", 0);
+							div.html("")
+								.style("left", "-500px")
+								.style("top", "-500px");
+						})
+						.on('click', function (d) {
+							$('#commununity-tab').tab('show');
+							$("#departments-select").val(e.department).change();
+						});
+				});
+			});
+
+			var div = d3.select("body").append("div")
+				.attr("class", "tooltip")
+				.style("opacity", 0);
+		}
 
 	};
 }());
