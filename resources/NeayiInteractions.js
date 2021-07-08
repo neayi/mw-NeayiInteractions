@@ -26,25 +26,7 @@ var neayiinteractions_controller = (function () {
 	return {
 		baseUrl: null,
 		imagepath: null,
-		isLoggedIn: false,
-		spinnerOptions: {
-			lines: 11, // The number of lines to draw
-			length: 8, // The length of each line
-			width: 4, // The line thickness
-			radius: 8, // The radius of the inner circle
-			corners: 1, // Corner roundness (0..1)
-			rotate: 0, // The rotation offset
-			direction: 1, // 1: clockwise, -1: counterclockwise
-			color: '#000', // #rgb or #rrggbb or array of colors
-			speed: 1, // Rounds per second
-			trail: 60, // ƒfterglow percentage
-			shadow: false, // Whether to render a shadow
-			hwaccel: false, // Whether to use hardware acceleration
-			className: 'spinner', // The CSS class to assign to the spinner
-			zIndex: 2e9, // The z-index (defaults to 2000000000)
-			top: '50%', // Top position relative to parent
-			left: '50%' // Left position relative to parent
-		},
+
 		initialize: function () {
 			this.baseUrl = window.location.href.split(/[?#]/)[0];
 			this.imagepath = mw.config.get('wgExtensionAssetsPath') +
@@ -57,8 +39,6 @@ var neayiinteractions_controller = (function () {
 				}
 				this.targetComment = hash;
 			}
-			this.isLoggedIn = mw.config.get('wgUserName') !== null;
-			var config = mw.config.get('NeayiInteractions');
 
 			mw.config.set('mwFollowedStatus', mw.config.get('NeayiInteractions').wgInitialFollowedStatus);
 
@@ -69,12 +49,14 @@ var neayiinteractions_controller = (function () {
 			this.loadStats();
 			this.loadCommunity('');
 		},
+
 		scrollToAnchor: function (id) {
 			var element = $('#' + id);
 			if (element.length) {
 				$('html,body').animate({ scrollTop: element.offset().top - 50 }, 'slow');
 			}
 		},
+
 		setupDivs: function () {
 			var self = this;
 			var pageTitle = mw.config.get('wgTitle');
@@ -153,7 +135,6 @@ var neayiinteractions_controller = (function () {
 			$('#community-doneit-only').on('change', function() {
 				self.loadCommunity();
 			  });
-
 		},
 
 		/**
@@ -189,6 +170,15 @@ var neayiinteractions_controller = (function () {
 		 */
 		loadCommunity: function (url = '') {
 			var self = this;
+
+			// Check if connected:
+			if (mw.user.isAnon())
+			{
+				$( '.community-not-connected' ).show();
+				$( '.community-connected' ).hide();
+				return;
+			}
+
 			var pageId = mw.config.get('wgArticleId');
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
 
