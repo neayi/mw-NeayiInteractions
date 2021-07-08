@@ -323,7 +323,7 @@ var neayiinteractions_controller = (function () {
 				e.preventDefault();
 
 				if (mw.user.isAnon()) {
-					$('#inviteLoginModal').modal('show')
+					$('#inviteLoginModal').modal('show');
 					return;
 				}
 			});
@@ -716,6 +716,10 @@ var neayiinteractions_controller = (function () {
 		 * @param {*} deptStats
 		 */
 		setupMap: function(deptStats) {
+
+			if (deptStats.length == 0)
+				return;
+
 			const width = 300, height = 270;
 			const path = d3.geoPath();
 			const projection = d3.geoConicConformal() // Lambert-93
@@ -729,8 +733,14 @@ var neayiinteractions_controller = (function () {
 				.attr('width', width)
 				.attr('height', height)
 				.attr('class', 'Greens');
-
 			const deps = svg.append('g');
+
+			const sideSvg = d3.select('#side-map').append('svg')
+				.attr('id', 'svg')
+				.attr('width', width)
+				.attr('height', height)
+				.attr('class', 'Greens');				
+			const sideDeps = sideSvg.append('g');
 
 			var promises = [];
 			promises.push(d3.json('/extensions/NeayiInteractions/resources/departments.json'));
@@ -738,12 +748,18 @@ var neayiinteractions_controller = (function () {
 			Promise.all(promises).then(function (values) {
 				const geojson = values[0]; // Récupération de la première promesse : le contenu du fichier JSON
 
-				var features = deps
-					.selectAll('path')
+				deps.selectAll('path')
 					.data(geojson.features)
 					.enter()
 					.append('path')
 					.attr('id', d => 'd' + d.properties.CODE_DEPT)
+					.attr('d', path);
+
+				sideDeps.selectAll('path')
+					.data(geojson.features)
+					.enter()
+					.append('path')
+					.attr('id', d => 'side-d' + d.properties.CODE_DEPT)
 					.attr('d', path);
 
 				// On calcule le max de la population pour adapter les couleurs
@@ -774,6 +790,29 @@ var neayiinteractions_controller = (function () {
 							$('#commununity-tab').tab('show');
 							$('#departments-select').val(e.department).change();
 						});
+
+					d3.select('#side-d' + e.department)
+						.attr('class', d => 'department q' + quantile(+e.count) + '-9')
+						.on('mouseover', function (d) {
+							div.transition()
+								.duration(200)
+								.style('opacity', 1);
+							div.html('<b>Département : </b>' + e.departmentData.pretty_page_label + '<br>'
+								+ '<b>Population : </b>' + e.count + '<br>')
+								.style('left', (d3.event.pageX + 30) + 'px')
+								.style('top', (d3.event.pageY - 30) + 'px');
+						})
+						.on('mouseout', function (d) {
+							div.style('opacity', 0);
+							div.html('')
+								.style('left', '-500px')
+								.style('top', '-500px');
+						})
+						.on('click', function (d) {
+							$( '#communityModal' ).modal('show');
+							$( '#commununity-tab' ).tab('show');
+							$( '#departments-select' ).val(e.department).change();
+						});						
 				});
 			});
 
