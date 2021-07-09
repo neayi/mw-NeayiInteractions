@@ -716,10 +716,10 @@ var neayiinteractions_controller = (function () {
 		 * @param {*} deptStats
 		 */
 		setupMap: function(deptStats) {
-
-			if (deptStats.length == 0)
+			var CSConfig = mw.config.get('CommentStreams');
+			if (!CSConfig)
 				return;
-
+				
 			const width = 300, height = 270;
 			const path = d3.geoPath();
 			const projection = d3.geoConicConformal() // Lambert-93

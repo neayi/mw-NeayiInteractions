@@ -23,7 +23,10 @@
 				"NeayiInteractions.js"
 			],
 			"dependencies": [
-				"ext.d3.core"
+				"ext.d3.core",
+				"jquery.ui",
+				"mediawiki.api",
+				"ext.bootstrap"
 			],
 			"targets": [
 				"desktop",
