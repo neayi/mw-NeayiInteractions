@@ -315,6 +315,14 @@ var neayiinteractions_controller = (function () {
 
 				self.disableButton(buttons);
 
+				if (typeof gtag === "function")
+				{
+					gtag('event', self.hasApplaused() ? 'unapplaude_click' : 'applaude_click', {
+						'event_label': 'Clic sur "Applaudir"',
+						'event_category': 'interaction_buttons'
+					});
+				}
+
 				if (self.hasApplaused())
 					self.ajaxInsights(['unapplause']);
 				else
@@ -340,6 +348,15 @@ var neayiinteractions_controller = (function () {
 			var self = this;
 
 			buttons.on('click', function (e) {
+
+				if (typeof gtag === "function")
+				{
+					gtag('event', self.hasFollowed() ? 'unfollow_click' : 'follow_click', {
+						'event_label': 'Clic sur "Suivre"',
+						'event_category': 'interaction_buttons'
+					});
+				}
+
 				if (mw.user.isAnon()) {
 					$('#requiresLoginModal').modal('show')
 					return;
@@ -384,6 +401,14 @@ var neayiinteractions_controller = (function () {
 			var self = this;
 
 			buttons.on('click', function (e) {
+
+				if (typeof gtag === "function")
+				{
+					gtag('event', self.hasDone() ? 'undone_it_click' : 'done_it_click', {
+						'event_label': 'Clic sur "Je l\'ai fait"',
+						'event_category': 'interaction_buttons'
+					});
+				}
 
 				if (mw.user.isAnon()) {
 					$('#requiresLoginModal').modal('show')
@@ -443,6 +468,14 @@ var neayiinteractions_controller = (function () {
 				$('.comments-link').on('click', function () {
 					self.scrollToAnchor('cs-comments');
 					window.location.hash = '#cs-comments';
+
+					if (typeof gtag === "function")
+					{
+						gtag('event', 'see_comments_click', {
+							'event_label': 'Clic sur "Voir les commentaires"',
+							'event_category': 'interaction_buttons'
+						});
+					}
 				});
 
 				// Now change the label
