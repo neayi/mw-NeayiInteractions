@@ -130,10 +130,26 @@ var neayiinteractions_controller = (function () {
 
 			$('select.community-select').on('change', function() {
 				self.loadCommunity();
+
+				if (typeof gtag === "function")
+				{
+					gtag('event', 'statsfilter_select_click', {
+						'event_label': 'Filtre dans la communauté - listes déroulantes',
+						'event_category': 'community_modal'
+					});
+				}
 			  });
 
 			$('#community-doneit-only').on('change', function() {
 				self.loadCommunity();
+
+				if (typeof gtag === "function")
+				{
+					gtag('event', 'statsfilter_donitonly_click', {
+						'event_label': 'Filtre dans la communauté - uniquement ceux qui l\'ont fait',
+						'event_category': 'community_modal'
+					});
+				}
 			  });
 		},
 
@@ -317,7 +333,7 @@ var neayiinteractions_controller = (function () {
 
 				if (typeof gtag === "function")
 				{
-					gtag('event', self.hasApplaused() ? 'unapplaude_click' : 'applaude_click', {
+					gtag('event', self.hasApplaused() ? 'unapplaud_click' : 'applaud_click', {
 						'event_label': 'Clic sur "Applaudir"',
 						'event_category': 'interaction_buttons'
 					});
@@ -699,6 +715,14 @@ var neayiinteractions_controller = (function () {
 
 				var dept = $(this).data('dept');
 				$( '#departments-select' ).val(dept).change();
+
+				if (typeof gtag === "function")
+				{
+					gtag('event', 'statsdept_click', {
+						'event_label': 'Clic sur le département dans la popup',
+						'event_category': 'community_modal'
+					});
+				}
 			});
 		},
 
@@ -728,6 +752,14 @@ var neayiinteractions_controller = (function () {
 
 				var guid = $(this).data('guid');
 				var type = $(this).data('type');
+
+				if (typeof gtag === "function")
+				{
+					gtag('event', 'statscharacteristics_click', {
+						'event_label': 'Clic sur une caractéristique dans la popup',
+						'event_category': 'community_modal'
+					});
+				}
 
 				switch (type) {
 					case 'croppingSystem':
@@ -822,6 +854,14 @@ var neayiinteractions_controller = (function () {
 						.on('click', function (d) {
 							$('#commununity-tab').tab('show');
 							$('#departments-select').val(e.department).change();
+
+							if (typeof gtag === "function")
+							{
+								gtag('event', 'statsmap_click', {
+									'event_label': 'Clic sur la carte dans la popup',
+									'event_category': 'community_modal'
+								});
+							}
 						});
 
 					d3.select('#side-d' + e.department)
@@ -845,7 +885,15 @@ var neayiinteractions_controller = (function () {
 							$( '#communityModal' ).modal('show');
 							$( '#commununity-tab' ).tab('show');
 							$( '#departments-select' ).val(e.department).change();
-						});						
+
+							if (typeof gtag === "function")
+							{
+								gtag('event', 'inpagemap_click', {
+									'event_label': 'Clic sur la carte dans la marge',
+									'event_category': 'interaction_buttons'
+								});
+							}
+						});
 				});
 			});
 
