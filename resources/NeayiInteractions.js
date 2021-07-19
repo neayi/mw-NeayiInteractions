@@ -755,7 +755,7 @@ var neayiinteractions_controller = (function () {
 			deptStats.slice(0, 5).forEach(function (e, i) {
 				$( '#departments-stats' )
 					.append( $(`<div class="dept-stat">
-									<a href="#" data-dept="${e.department_number}"><span class="count">x ` + e.count + `</span><span class="dept-name">${e.departmentData.pretty_page_label}</span></a>
+									<a href="#" data-dept="${e.department_number}"><span class="count">x ${e.count}</span><span class="dept-name">${e.departmentData.pretty_page_label}</span></a>
 								</div>`) );
 			});
 
@@ -792,7 +792,7 @@ var neayiinteractions_controller = (function () {
 										<div><a href="#" data-guid="${e.uuid}" data-type="${e.type}" title="${e.page_label}"><img alt="${e.page_label}" src="${insightsURL}api/icon/${e.uuid}/90"></a></div>
 										<div class="label"><a href="#" data-guid="${e.uuid}" data-type="${e.type}" title="${e.page_label}">${e.pretty_page_label}</a></div>
 									</div>
-									<div class="caracteristique-stat">x "${e.count}</div>
+									<div class="caracteristique-stat">x ${e.count}</div>
 								</div>`) );
 			});
 
@@ -892,7 +892,7 @@ var neayiinteractions_controller = (function () {
 								.duration(200)
 								.style('opacity', 1);
 							div.html('<b>Département : </b>' + e.departmentData.pretty_page_label + '<br>'
-								+ '<b>Population : </b>' + e.count + '<br>')
+								+ '<b>Communauté : </b>' + e.count + '<br>')
 								.style('left', (d3.event.pageX + 30) + 'px')
 								.style('top', (d3.event.pageY - 30) + 'px');
 						})
@@ -922,7 +922,7 @@ var neayiinteractions_controller = (function () {
 								.duration(200)
 								.style('opacity', 1);
 							div.html('<b>Département : </b>' + e.departmentData.pretty_page_label + '<br>'
-								+ '<b>Population : </b>' + e.count + '<br>')
+								+ '<b>Communauté : </b>' + e.count + '<br>')
 								.style('left', (d3.event.pageX + 30) + 'px')
 								.style('top', (d3.event.pageY - 30) + 'px');
 						})
