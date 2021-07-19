@@ -20,6 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+/*@nomin*/
+
 var neayiinteractions_controller = (function () {
 	'use strict';
 
@@ -131,7 +133,7 @@ var neayiinteractions_controller = (function () {
 			$('select.community-select').on('change', function() {
 				self.loadCommunity();
 
-				if (typeof gtag === "function")
+				if (typeof gtag === 'function')
 				{
 					gtag('event', 'statsfilter_select_click', {
 						'event_label': 'Filtre dans la communauté - listes déroulantes',
@@ -143,7 +145,7 @@ var neayiinteractions_controller = (function () {
 			$('#community-doneit-only').on('change', function() {
 				self.loadCommunity();
 
-				if (typeof gtag === "function")
+				if (typeof gtag === 'function')
 				{
 					gtag('event', 'statsfilter_donitonly_click', {
 						'event_label': 'Filtre dans la communauté - uniquement ceux qui l\'ont fait',
@@ -331,7 +333,7 @@ var neayiinteractions_controller = (function () {
 
 				self.disableButton(buttons);
 
-				if (typeof gtag === "function")
+				if (typeof gtag === 'function')
 				{
 					gtag('event', self.hasApplaused() ? 'unapplaud_click' : 'applaud_click', {
 						'event_label': 'Clic sur "Applaudir"',
@@ -365,7 +367,7 @@ var neayiinteractions_controller = (function () {
 
 			buttons.on('click', function (e) {
 
-				if (typeof gtag === "function")
+				if (typeof gtag === 'function')
 				{
 					gtag('event', self.hasFollowed() ? 'unfollow_click' : 'follow_click', {
 						'event_label': 'Clic sur "Suivre"',
@@ -418,7 +420,7 @@ var neayiinteractions_controller = (function () {
 
 			buttons.on('click', function (e) {
 
-				if (typeof gtag === "function")
+				if (typeof gtag === 'function')
 				{
 					gtag('event', self.hasDone() ? 'undone_it_click' : 'done_it_click', {
 						'event_label': 'Clic sur "Je l\'ai fait"',
@@ -485,7 +487,7 @@ var neayiinteractions_controller = (function () {
 					self.scrollToAnchor('cs-comments');
 					window.location.hash = '#cs-comments';
 
-					if (typeof gtag === "function")
+					if (typeof gtag === 'function')
 					{
 						gtag('event', 'see_comments_click', {
 							'event_label': 'Clic sur "Voir les commentaires"',
@@ -563,10 +565,33 @@ var neayiinteractions_controller = (function () {
 
 			$( '.neayi-interaction-doneit-label' ).text(doers);
 
+			var labelDone = "Fait !";
+			var labelMarkAsDone = "Je le fais";
+
+			if ($( '#neayi-type-page' ))
+			{
+				var typePage = $( '#neayi-type-page' ).text();
+				switch (typePage) {
+					case 'Production':
+						labelDone = "Fait !";
+						labelMarkAsDone = "J'en fais";
+						break;
+
+					case 'Ravageur':
+						labelDone = "J'en ai !";
+						labelMarkAsDone = "J'en ai";
+						break;
+
+					default:
+						break;
+				}
+
+			}
+
 			if (this.hasDone())
-				$( '.neayi-interaction-doneit' ).html(`<span style="vertical-align: middle;">Fait !</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">beenhere</span>`).prop("disabled", false);
+				$( '.neayi-interaction-doneit' ).html(`<span style="vertical-align: middle;">${labelDone}</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">beenhere</span>`).prop("disabled", false);
 			else
-				$( '.neayi-interaction-doneit' ).text("Je le fais").prop("disabled", false);
+				$( '.neayi-interaction-doneit' ).text(labelMarkAsDone).prop("disabled", false);
 		},
 
 		disableButton: function (buttons) {
@@ -584,12 +609,26 @@ var neayiinteractions_controller = (function () {
 
 			var self = this;
 
+			data.department.sort(function(a, b) {
+				var a = a.department_number;
+				var b = b.department_number;
+
+				// Forza Corsica!
+				if (a == '2A' || a== '2B')
+					a = 20;
+
+				if (b == '2A' || b == '2B')
+					b = 20;
+
+				return a - b;
+			  });
+
 			data.department.forEach(item => {
 
 				if (!item.departmentData)
 					return;
 
-				self.addOptionToSelect('departments-select', item.departmentData.pretty_page_label + ' (' + item.count + ')', item.department);
+				self.addOptionToSelect('departments-select', item.departmentData.pretty_page_label + ' (' + item.count + ')', item.department_number);
 			});
 
 			// Add the productions
@@ -627,49 +666,59 @@ var neayiinteractions_controller = (function () {
 
 			data.forEach(user => {
 
-				if (user['structure'] != '')
-					user['structure'] = ' (<a href="/wiki/Structure:'+user['structure']+'">'+user['structure']+'</a>)';
+				var context = user['context'];
 
-				if (user['hasDone'] == 0)
-					user['hasDone'] = '<span class="status">Le suit</span>';
-				else if (user['hasDone'] == 1)
-					user['hasDone'] = '<span class="status">Le fait</span>';
-				else
-					user['hasDone'] = '<span class="status">Le fait depuis ' + user['hasDone'].substring(0, 4) + '</span>';
+				var subTitle = context['sector'];
+				if (context['structure'] != '')
+					subTitle = subTitle + ' (<a href="/wiki/Structure:'+context['structure']+'">'+context['structure']+'</a>)';
+				subTitle = '<div class="follower-item-usertitle">' + subTitle + '</div>';
+
+				var interaction = '<span class="status">Le suit</span>';
+				if (user['interaction']['done'] == true)
+				{
+					if (user['interaction']['done_at'] == null)
+						interaction = '<span class="status">Le fait</span>';
+					else
+						interaction = '<span class="status">Le fait depuis ' + user['interaction']['done_at'].substring(0, 4) + '</span>';
+				}
 
 				var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
 
-				var profileURL = insightsURL + 'tp/' + encodeURI(user['fullname']) +'/' + user['userGuid'];
-				if (connectedUserGUID == user['userGuid'])
+				var profileURL = insightsURL + 'tp/' + encodeURI(context['fullname']) +'/' + context['user_uuid'];
+				if (connectedUserGUID == context['user_uuid'])
 					profileURL = insightsURL + 'profile';
 
-				var userdiv = $(`<div class="follower-item d-flex flex-wrap">
-								<div class="follower-item-avatar"><img
-										src="` + insightsURL + `api/user/avatar/` + user['userGuid'] + `/100">
-								</div>
-								<div class="follower-item-user">
-									<div class="follower-item-username"><a
-											href="` + profileURL + `">` + user['fullname'] + `</a> ` + user['hasDone'] + `</div>
-									<div class="follower-item-usertitle">` + user['sector'] + user['structure'] + `</div>
-								</div>
-								<div class="follower-item-features flex-fill">
-									<div class="d-flex flex-wrap justify-content-start caracteristiques-exploitation"></div>
-								</div>
-							</div>`);
+				var avatarURL = insightsURL + 'api/user/avatar/' + context['user_uuid'] + '/100';
+				var avatarDiv = `<div class="follower-item-avatar"><img src="${avatarURL}" /></div>`;
+				var userName = `<a href="${profileURL}">${context['fullname']}</a>`;
+				userName = '<div class="follower-item-username">'+userName + ' ' + interaction+'</div>';
 
-				var features = userdiv.find( "div.caracteristiques-exploitation" );
+				var characteristicsPlaceholder = `<div class="follower-item-features flex-fill">
+														<div class="d-flex flex-wrap justify-content-start caracteristiques-exploitation"></div>
+													</div>`;
+
+				var userdiv = $(`<div class="follower-item d-flex flex-wrap">
+									${avatarDiv}
+									<div class="follower-item-user">${userName} ${subTitle}</div>
+									${characteristicsPlaceholder}
+								</div>`);
+
+				var features = userdiv.find( 'div.caracteristiques-exploitation' );
 
 				// Add the department
-				var depName = user['characteristicsDepartement'][0].page;
-				var depIcon = user['characteristicsDepartement'][0].icon;
-				features.append(self.makeFeature(depName, 'Département ' + user['department'], depIcon));
+				if (context['department'] != null)
+				{
+					var depName = context['characteristics_departement'][0].page;
+					var depIcon = context['characteristics_departement'][0].icon;
+					features.append(self.makeFeature(depName, depName, depIcon));
+				}
 
 				// Add the productions
-				user['productions'].forEach(element => {
+				context['productions'].forEach(element => {
 					features.append(self.makeFeature(element['caption'], element['page'], element['icon']));
 				});
 
-				user['characteristics'].forEach(element => {
+				context['characteristics'].forEach(element => {
 					features.append(self.makeFeature(element['caption'], element['page'], element['icon']));
 				});
 
@@ -705,7 +754,9 @@ var neayiinteractions_controller = (function () {
 
 			deptStats.slice(0, 5).forEach(function (e, i) {
 				$( '#departments-stats' )
-					.append( $(`<div class="dept-stat"><a href="#" data-dept="`+e.department+`"><span class="count">x ` + e.count + `</span><span class="dept-name">` + e.departmentData.pretty_page_label + `</span></a></div>`) );
+					.append( $(`<div class="dept-stat">
+									<a href="#" data-dept="${e.department_number}"><span class="count">x ` + e.count + `</span><span class="dept-name">${e.departmentData.pretty_page_label}</span></a>
+								</div>`) );
 			});
 
 			$( '#departments-stats a' ).on('click', function (e) {
@@ -716,7 +767,7 @@ var neayiinteractions_controller = (function () {
 				var dept = $(this).data('dept');
 				$( '#departments-select' ).val(dept).change();
 
-				if (typeof gtag === "function")
+				if (typeof gtag === 'function')
 				{
 					gtag('event', 'statsdept_click', {
 						'event_label': 'Clic sur le département dans la popup',
@@ -738,10 +789,10 @@ var neayiinteractions_controller = (function () {
 				$( divId + ' .stats-icons' )
 					.append( $(`<div class="caracteristique-exploitation">
 									<div>
-										<div><a href="#" data-guid="` + e.uuid + `" data-type="` + e.type + `" title="` + e.page_label + `"><img alt="` + e.page_label + `" src="`+insightsURL + 'api/icon/' + e.uuid+`/90"></a></div>
-										<div class="label"><a href="#" data-guid="` + e.uuid + `" data-type="` + e.type + `" title="` + e.page_label + `">` + e.pretty_page_label + `</a></div>
+										<div><a href="#" data-guid="${e.uuid}" data-type="${e.type}" title="${e.page_label}"><img alt="${e.page_label}" src="${insightsURL}api/icon/${e.uuid}/90"></a></div>
+										<div class="label"><a href="#" data-guid="${e.uuid}" data-type="${e.type}" title="${e.page_label}">${e.pretty_page_label}</a></div>
 									</div>
-									<div class="caracteristique-stat">x ` + e.count + `</div>
+									<div class="caracteristique-stat">x "${e.count}</div>
 								</div>`) );
 			});
 
@@ -753,7 +804,7 @@ var neayiinteractions_controller = (function () {
 				var guid = $(this).data('guid');
 				var type = $(this).data('type');
 
-				if (typeof gtag === "function")
+				if (typeof gtag === 'function')
 				{
 					gtag('event', 'statscharacteristics_click', {
 						'event_label': 'Clic sur une caractéristique dans la popup',
@@ -834,7 +885,7 @@ var neayiinteractions_controller = (function () {
 
 				deptStats.forEach(function (e, i) {
 
-					d3.select('#d' + e.department)
+					d3.select('#d' + e.department_number)
 						.attr('class', d => 'department q' + quantile(+e.count) + '-9')
 						.on('mouseover', function (d) {
 							div.transition()
@@ -853,9 +904,9 @@ var neayiinteractions_controller = (function () {
 						})
 						.on('click', function (d) {
 							$('#commununity-tab').tab('show');
-							$('#departments-select').val(e.department).change();
+							$('#departments-select').val(e.department_number).change();
 
-							if (typeof gtag === "function")
+							if (typeof gtag === 'function')
 							{
 								gtag('event', 'statsmap_click', {
 									'event_label': 'Clic sur la carte dans la popup',
@@ -864,7 +915,7 @@ var neayiinteractions_controller = (function () {
 							}
 						});
 
-					d3.select('#side-d' + e.department)
+					d3.select('#side-d' + e.department_number)
 						.attr('class', d => 'department q' + quantile(+e.count) + '-9')
 						.on('mouseover', function (d) {
 							div.transition()
@@ -884,9 +935,9 @@ var neayiinteractions_controller = (function () {
 						.on('click', function (d) {
 							$( '#communityModal' ).modal('show');
 							$( '#commununity-tab' ).tab('show');
-							$( '#departments-select' ).val(e.department).change();
+							$( '#departments-select' ).val(e.department_number).change();
 
-							if (typeof gtag === "function")
+							if (typeof gtag === 'function')
 							{
 								gtag('event', 'inpagemap_click', {
 									'event_label': 'Clic sur la carte dans la marge',
