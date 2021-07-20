@@ -862,7 +862,7 @@ var neayiinteractions_controller = (function () {
 			if (!CSConfig)
 				return;
 				
-			if ($('#map svg').length > 0)
+			if ($('#side-map-svg').length > 0)
 				return this.refreshMap(deptStats);
 
 			const width = 300, height = 270;
@@ -874,14 +874,14 @@ var neayiinteractions_controller = (function () {
 			path.projection(projection);
 
 			const svg = d3.select('#map').append('svg')
-				.attr('id', 'svg')
+				.attr('id', 'map-svg')
 				.attr('width', width)
 				.attr('height', height)
 				.attr('class', 'Greens');
 			const deps = svg.append('g');
 
 			const sideSvg = d3.select('#side-map').append('svg')
-				.attr('id', 'svg')
+				.attr('id', 'side-map-svg')
 				.attr('width', width)
 				.attr('height', height)
 				.attr('class', 'Greens');				
