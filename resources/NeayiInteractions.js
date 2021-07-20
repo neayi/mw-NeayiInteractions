@@ -42,7 +42,7 @@ var neayiinteractions_controller = (function () {
 				this.targetComment = hash;
 			}
 
-			mw.config.set('mwFollowedStatus', mw.config.get('NeayiInteractions').wgInitialFollowedStatus);
+			mw.config.set('mwInternalFollowStatus', mw.config.get('NeayiInteractions').wgInitialFollowedStatus);
 
 			this.setupDivs();
 
@@ -250,7 +250,7 @@ var neayiinteractions_controller = (function () {
 		/**
 		 * Load the stats from insights
 		 */
-		 loadStats: function () {
+		loadStats: function () {
 			var self = this;
 			var pageId = mw.config.get('wgArticleId');
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
@@ -276,9 +276,12 @@ var neayiinteractions_controller = (function () {
 		},
 
 		hasFollowed: function () {
-			var followedStatus = mw.config.get('mwFollowedStatus');
+			var interactions = mw.config.get('mwInteractions');
 
-			return followedStatus == true;
+			if (interactions && interactions.state.follow)
+				return true;
+
+			return false;			
 		},
 
 		hasDone: function () {
@@ -318,6 +321,8 @@ var neayiinteractions_controller = (function () {
 				self.setApplauseLabels();
 				self.setFollowersLabels();
 				self.setDoneItLabels();
+
+				self.loadStats();
 			});
 		},
 
@@ -380,28 +385,12 @@ var neayiinteractions_controller = (function () {
 					return;
 				}
 
-				var mwTitle = mw.config.get('wgRelevantPageName');
-
 				self.disableButton(buttons);
 
 				if (self.hasFollowed()) {
-					new mw.Api().unwatch(mwTitle)
-						.done(function () {
-							mw.config.set('mwFollowedStatus', false);
-						})
-						.fail(function () {
-						});
-
 					self.ajaxInsights(['unfollow']);
 				}
 				else {
-					new mw.Api().watch(mwTitle)
-						.done(function () {
-							mw.config.set('mwFollowedStatus', true);
-						})
-						.fail(function () {
-						});
-
 					self.ajaxInsights(['follow']);
 				}
 
@@ -548,6 +537,32 @@ var neayiinteractions_controller = (function () {
 				$( '.neayi-interaction-suivre' ).html(`<span style="vertical-align: middle;">Suivi</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`).prop("disabled", false);
 			else
 				$( '.neayi-interaction-suivre' ).text("Suivre").prop("disabled", false);
+
+			// Align the internal mediawiki status with the follow status:
+			var currentInternalFollowStatus = mw.config.get('mwInternalFollowStatus');
+			if (currentInternalFollowStatus != this.hasFollowed())
+			{				
+				var mwTitle = mw.config.get('wgRelevantPageName');
+
+				if (this.hasFollowed())
+				{
+					new mw.Api().watch(mwTitle)
+						.done(function () {
+							mw.config.set('mwInternalFollowStatus', true);
+						})
+						.fail(function () {
+						});	
+				}
+				else
+				{
+					new mw.Api().unwatch(mwTitle)
+						.done(function () {
+							mw.config.set('mwInternalFollowStatus', false);
+						})
+						.fail(function () {
+						});
+				}
+			}
 		},
 
 		setDoneItLabels: function () {
@@ -606,8 +621,11 @@ var neayiinteractions_controller = (function () {
 		 * @param {*} data
 		 */
 		 setStats: function (data) {
-
 			var self = this;
+
+			self.clearSelect('departments-select');
+			self.clearSelect('famings-select');
+			self.clearSelect('cropping-systems-select');
 
 			data.department.sort(function(a, b) {
 				var a = a.department_number;
@@ -647,6 +665,10 @@ var neayiinteractions_controller = (function () {
 			$( '#communityModal' ).modal('handleUpdate');
 		},
 
+		clearSelect: function (selectId, label, value) {
+			$("#"+selectId + " option[value != '']").remove();
+		},
+		
 		addOptionToSelect: function (selectId, label, value) {
 			$('#'+selectId).append($( '<option>' ).attr("value", value).text(label));
 		},
@@ -751,6 +773,8 @@ var neayiinteractions_controller = (function () {
 			deptStats.sort(function(a, b) {
 				return b.count - a.count;
 			  });
+			
+			$( '#departments-stats' ).html('');
 
 			deptStats.slice(0, 5).forEach(function (e, i) {
 				$( '#departments-stats' )
@@ -784,6 +808,8 @@ var neayiinteractions_controller = (function () {
 			  });
 
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
+
+			$( divId + ' .stats-icons' ).html('');
 
 			characteristicsStats.slice(0, 5).forEach(function (e, i) {
 				$( divId + ' .stats-icons' )
@@ -836,6 +862,9 @@ var neayiinteractions_controller = (function () {
 			if (!CSConfig)
 				return;
 				
+			if ($('#map svg').length > 0)
+				return this.refreshMap(deptStats);
+
 			const width = 300, height = 270;
 			const path = d3.geoPath();
 			const projection = d3.geoConicConformal() // Lambert-93
@@ -951,7 +980,97 @@ var neayiinteractions_controller = (function () {
 			var div = d3.select('body').append('div')
 				.attr('class', 'tooltip')
 				.style('opacity', 0);
-		}
+		},
+
+		/**
+		 * Setup the d3js map as inspired from https://www.datavis.fr/index.php?page=map-population
+		 * @param {*} deptStats
+		 */
+		 refreshMap: function(deptStats) {
+			var CSConfig = mw.config.get('CommentStreams');
+			if (!CSConfig)
+				return;
+
+			// On calcule le max de la population pour adapter les couleurs
+			var quantile = d3.scaleQuantile()
+				.domain([0, d3.max(deptStats, e => +e.count)])
+				.range(d3.range(9));
+
+			d3.selectAll('#map path')
+				.attr('class', '')
+				.on('mouseover', null)
+				.on('mouseout', null)
+				.on('click', null);
+			d3.selectAll('#side-map path')
+				.attr('class', '')
+				.on('mouseover', null)
+				.on('mouseout', null)
+				.on('click', null);
+
+			deptStats.forEach(function (e, i) {
+
+				d3.select('#d' + e.department_number)
+					.attr('class', d => 'department q' + quantile(+e.count) + '-9')
+					.on('mouseover', function (d) {
+						div.transition()
+							.duration(200)
+							.style('opacity', 1);
+						div.html('<b>Département : </b>' + e.departmentData.pretty_page_label + '<br>'
+							+ '<b>Communauté : </b>' + e.count + '<br>')
+							.style('left', (d3.event.pageX + 30) + 'px')
+							.style('top', (d3.event.pageY - 30) + 'px');
+					})
+					.on('mouseout', function (d) {
+						div.style('opacity', 0);
+						div.html('')
+							.style('left', '-500px')
+							.style('top', '-500px');
+					})
+					.on('click', function (d) {
+						$('#commununity-tab').tab('show');
+						$('#departments-select').val(e.department_number).change();
+
+						if (typeof gtag === 'function')
+						{
+							gtag('event', 'statsmap_click', {
+								'event_label': 'Clic sur la carte dans la popup',
+								'event_category': 'community_modal'
+							});
+						}
+					});
+
+				d3.select('#side-d' + e.department_number)
+					.attr('class', d => 'department q' + quantile(+e.count) + '-9')
+					.on('mouseover', function (d) {
+						div.transition()
+							.duration(200)
+							.style('opacity', 1);
+						div.html('<b>Département : </b>' + e.departmentData.pretty_page_label + '<br>'
+							+ '<b>Communauté : </b>' + e.count + '<br>')
+							.style('left', (d3.event.pageX + 30) + 'px')
+							.style('top', (d3.event.pageY - 30) + 'px');
+					})
+					.on('mouseout', function (d) {
+						div.style('opacity', 0);
+						div.html('')
+							.style('left', '-500px')
+							.style('top', '-500px');
+					})
+					.on('click', function (d) {
+						$( '#communityModal' ).modal('show');
+						$( '#commununity-tab' ).tab('show');
+						$( '#departments-select' ).val(e.department_number).change();
+
+						if (typeof gtag === 'function')
+						{
+							gtag('event', 'inpagemap_click', {
+								'event_label': 'Clic sur la carte dans la marge',
+								'event_category': 'interaction_buttons'
+							});
+						}
+					});
+			});
+		}		
 
 	};
 }());
