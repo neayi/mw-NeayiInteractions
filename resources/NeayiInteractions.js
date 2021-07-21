@@ -880,7 +880,7 @@ var neayiinteractions_controller = (function () {
 				.attr('class', 'Greens');
 			const deps = svg.append('g');
 
-			const sideSvg = d3.select('#side-map').append('svg')
+			const sideSvg = d3.select('#side-map-container').append('svg')
 				.attr('id', 'side-map-svg')
 				.attr('width', width)
 				.attr('height', height)
