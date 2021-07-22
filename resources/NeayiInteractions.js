@@ -132,27 +132,34 @@ var neayiinteractions_controller = (function () {
 
 			$('select.community-select').on('change', function() {
 				self.loadCommunity();
-
-				if (typeof gtag === 'function')
-				{
-					gtag('event', 'statsfilter_select_click', {
-						'event_label': 'Filtre dans la communauté - listes déroulantes',
-						'event_category': 'community_modal'
-					});
-				}
+				self.logEvent('statsfilter_select_click', 'Filtre dans la communauté - listes déroulantes', 'community_modal');
 			  });
 
 			$('#community-doneit-only').on('change', function() {
 				self.loadCommunity();
-
-				if (typeof gtag === 'function')
-				{
-					gtag('event', 'statsfilter_donitonly_click', {
-						'event_label': 'Filtre dans la communauté - uniquement ceux qui l\'ont fait',
-						'event_category': 'community_modal'
-					});
-				}
+				self.logEvent('statsfilter_donitonly_click', 'Filtre dans la communauté - uniquement ceux qui l\'ont fait', 'community_modal');
 			  });
+		},
+
+		/**
+		 * Log an event to Google Analytics and facebook
+		 * @param String name
+		 * @param String label
+		 * @param String category
+		 */
+		logEvent: function(name, label, category) {
+			if (typeof gtag === 'function')
+			{
+				gtag('event', name, {
+					'event_label': label,
+					'event_category': category
+				});
+			}
+
+			if (typeof fbq === 'function')
+			{
+				fbq('trackCustom', name);
+			}
 		},
 
 		/**
@@ -337,14 +344,7 @@ var neayiinteractions_controller = (function () {
 			buttons.on('click', function (e) {
 
 				self.disableButton(buttons);
-
-				if (typeof gtag === 'function')
-				{
-					gtag('event', self.hasApplaused() ? 'unapplaud_click' : 'applaud_click', {
-						'event_label': 'Clic sur "Applaudir"',
-						'event_category': 'interaction_buttons'
-					});
-				}
+				self.logEvent(self.hasApplaused() ? 'unapplaud_click' : 'applaud_click', 'Clic sur "Applaudir"', 'interaction_buttons');
 
 				if (self.hasApplaused())
 					self.ajaxInsights(['unapplause']);
@@ -371,14 +371,7 @@ var neayiinteractions_controller = (function () {
 			var self = this;
 
 			buttons.on('click', function (e) {
-
-				if (typeof gtag === 'function')
-				{
-					gtag('event', self.hasFollowed() ? 'unfollow_click' : 'follow_click', {
-						'event_label': 'Clic sur "Suivre"',
-						'event_category': 'interaction_buttons'
-					});
-				}
+				self.logEvent(self.hasFollowed() ? 'unfollow_click' : 'follow_click', 'Clic sur "Suivre"', 'interaction_buttons');
 
 				if (mw.user.isAnon()) {
 					$('#requiresLoginModal').modal('show')
@@ -408,14 +401,7 @@ var neayiinteractions_controller = (function () {
 			var self = this;
 
 			buttons.on('click', function (e) {
-
-				if (typeof gtag === 'function')
-				{
-					gtag('event', self.hasDone() ? 'undone_it_click' : 'done_it_click', {
-						'event_label': 'Clic sur "Je l\'ai fait"',
-						'event_category': 'interaction_buttons'
-					});
-				}
+				self.logEvent(self.hasDone() ? 'undone_it_click' : 'done_it_click', 'Clic sur "Je l\'ai fait"', 'interaction_buttons');
 
 				if (mw.user.isAnon()) {
 					$('#requiresLoginModal').modal('show')
@@ -463,6 +449,7 @@ var neayiinteractions_controller = (function () {
 		 */
 		setupCommentsButton: function () {
 			var CSConfig = mw.config.get('CommentStreams');
+			var self = this;
 
 			if (!CSConfig) {
 				$('.comments-link').text('').prop('disabled', true);
@@ -475,14 +462,7 @@ var neayiinteractions_controller = (function () {
 				$('.comments-link').on('click', function () {
 					self.scrollToAnchor('cs-comments');
 					window.location.hash = '#cs-comments';
-
-					if (typeof gtag === 'function')
-					{
-						gtag('event', 'see_comments_click', {
-							'event_label': 'Clic sur "Voir les commentaires"',
-							'event_category': 'interaction_buttons'
-						});
-					}
+					self.logEvent('see_comments_click', 'Clic sur "Voir les commentaires"', 'interaction_buttons');
 				});
 
 				// Now change the label
@@ -770,6 +750,8 @@ var neayiinteractions_controller = (function () {
 		},
 
 		setupDepartmentsStats: function(deptStats) {
+			var self = this;
+
 			deptStats.sort(function(a, b) {
 				return b.count - a.count;
 			  });
@@ -791,17 +773,12 @@ var neayiinteractions_controller = (function () {
 				var dept = $(this).data('dept');
 				$( '#departments-select' ).val(dept).change();
 
-				if (typeof gtag === 'function')
-				{
-					gtag('event', 'statsdept_click', {
-						'event_label': 'Clic sur le département dans la popup',
-						'event_category': 'community_modal'
-					});
-				}
+				self.logEvent('statsdept_click', 'Clic sur le département dans la popup', 'community_modal');
 			});
 		},
 
 		setupCharacteristicsStats: function(divId, characteristicsStats) {
+			var self = this;
 
 			characteristicsStats.sort(function(a, b) {
 				return b.count - a.count;
@@ -830,13 +807,7 @@ var neayiinteractions_controller = (function () {
 				var guid = $(this).data('guid');
 				var type = $(this).data('type');
 
-				if (typeof gtag === 'function')
-				{
-					gtag('event', 'statscharacteristics_click', {
-						'event_label': 'Clic sur une caractéristique dans la popup',
-						'event_category': 'community_modal'
-					});
-				}
+				self.logEvent('statscharacteristics_click', 'Clic sur une caractéristique dans la popup', 'community_modal');
 
 				switch (type) {
 					case 'croppingSystem':
@@ -858,6 +829,8 @@ var neayiinteractions_controller = (function () {
 		 * @param {*} deptStats
 		 */
 		setupMap: function(deptStats) {
+			var self = this;
+
 			var CSConfig = mw.config.get('CommentStreams');
 			if (!CSConfig)
 				return;
@@ -935,13 +908,7 @@ var neayiinteractions_controller = (function () {
 							$('#commununity-tab').tab('show');
 							$('#departments-select').val(e.department_number).change();
 
-							if (typeof gtag === 'function')
-							{
-								gtag('event', 'statsmap_click', {
-									'event_label': 'Clic sur la carte dans la popup',
-									'event_category': 'community_modal'
-								});
-							}
+							self.logEvent('statsmap_click', 'Clic sur la carte dans la popup',  'community_modal');
 						});
 
 					d3.select('#side-d' + e.department_number)
@@ -966,13 +933,7 @@ var neayiinteractions_controller = (function () {
 							$( '#commununity-tab' ).tab('show');
 							$( '#departments-select' ).val(e.department_number).change();
 
-							if (typeof gtag === 'function')
-							{
-								gtag('event', 'inpagemap_click', {
-									'event_label': 'Clic sur la carte dans la marge',
-									'event_category': 'interaction_buttons'
-								});
-							}
+							self.logEvent('inpagemap_click', 'Clic sur la carte dans la marge', 'interaction_buttons');
 						});
 				});
 			});
@@ -987,6 +948,8 @@ var neayiinteractions_controller = (function () {
 		 * @param {*} deptStats
 		 */
 		 refreshMap: function(deptStats) {
+			var self = this;
+
 			var CSConfig = mw.config.get('CommentStreams');
 			if (!CSConfig)
 				return;
@@ -1030,13 +993,7 @@ var neayiinteractions_controller = (function () {
 						$('#commununity-tab').tab('show');
 						$('#departments-select').val(e.department_number).change();
 
-						if (typeof gtag === 'function')
-						{
-							gtag('event', 'statsmap_click', {
-								'event_label': 'Clic sur la carte dans la popup',
-								'event_category': 'community_modal'
-							});
-						}
+						self.logEvent('statsmap_click', 'Clic sur la carte dans la popup', 'community_modal');
 					});
 
 				d3.select('#side-d' + e.department_number)
@@ -1061,13 +1018,7 @@ var neayiinteractions_controller = (function () {
 						$( '#commununity-tab' ).tab('show');
 						$( '#departments-select' ).val(e.department_number).change();
 
-						if (typeof gtag === 'function')
-						{
-							gtag('event', 'inpagemap_click', {
-								'event_label': 'Clic sur la carte dans la marge',
-								'event_category': 'interaction_buttons'
-							});
-						}
+						self.logEvent('inpagemap_click', 'Clic sur la carte dans la marge', 'interaction_buttons');
 					});
 			});
 		}		
