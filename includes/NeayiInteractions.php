@@ -26,6 +26,7 @@ namespace MediaWiki\Extension\NeayiInteractions;
 use ExtensionRegistry;
 use MWNamespace;
 use MediaWiki\MediaWikiServices;
+use HitCounters;
 
 class NeayiInteractions {
 
@@ -53,7 +54,7 @@ class NeayiInteractions {
 
 	/**
 	 * disables the display of comments on the current page
-	 * 
+	 *
 	 * Called on hook <no-neayi-interactions/> or <no-comment-streams/>
 	 */
 	public function disableInteractionsOnPage() {
@@ -138,7 +139,7 @@ class NeayiInteractions {
 		$title = $output->getTitle();
 
 		$neayiInteractionsParams = [];
-		
+
 		$neayiInteractionsParams[ 'wgUserApiToken' ] = '';
 		$user = $output->getUser();
 		if ( !$user->isAnon() ) {
@@ -156,6 +157,8 @@ class NeayiInteractions {
 			$neayiInteractionsParams['wgUserGuid'] = '';
 		else
 			$neayiInteractionsParams['wgUserGuid'] = $this->getNeayiGuid($user);
+
+		$neayiInteractionsParams['wgPageViews'] = HitCounters\HitCounters::getCount( $title );
 
 		$output->addJsConfigVars( 'NeayiInteractions', $neayiInteractionsParams );
 		$output->addModules( 'ext.NeayiInteractions' );
@@ -183,7 +186,7 @@ class NeayiInteractions {
 		return '';
 	}
 
-	/** 
+	/**
 	 * Cache the GUIDs for Users
 	 */
 	private static function getNeayiApiToken( $user )
@@ -201,7 +204,7 @@ class NeayiInteractions {
 		);
 		if ( $result )
 			return (string)$result->neayiauth_external_apitoken;
-			
+
 		return '';
-	}	
+	}
 }
