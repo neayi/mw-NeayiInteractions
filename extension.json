@@ -10,7 +10,10 @@
 	"type": "parserhook",
 	"license-name": "MIT",
 	"requires": {
-		"MediaWiki": ">= 1.35.0"
+		"MediaWiki": ">= 1.35.0",
+		"extensions": {
+			"HitCounters": "*"
+			}
 	},
 	"MessagesDirs": {
 		"NeayiInteractions": [

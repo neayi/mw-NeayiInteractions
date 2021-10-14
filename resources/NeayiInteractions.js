@@ -44,6 +44,9 @@ var neayiinteractions_controller = (function () {
 
 			mw.config.set('mwInternalFollowStatus', mw.config.get('NeayiInteractions').wgInitialFollowedStatus);
 
+			if ($('.portail').length > 0)
+				return;
+
 			this.setupDivs();
 
 			this.getInitialCounts();
@@ -63,8 +66,12 @@ var neayiinteractions_controller = (function () {
 			var self = this;
 			var pageTitle = mw.config.get('wgTitle');
 			var relevantPageName = mw.config.get('wgRelevantPageName');
+			var views = mw.config.get('NeayiInteractions').wgPageViews;
 
 			$('#interaction-title').text(pageTitle);
+
+			if (views > 50)
+				$('<span class="page-views">' + views + '<i class="far fa-eye"></i></span>').insertAfter($('#interaction-title'));
 
 			// Copy the page menu in the new interaction bloc on the right
 			$('#p-contentnavigation').clone(true).appendTo("#neayi-interaction-desktop-menu").removeAttr('id');
@@ -288,7 +295,7 @@ var neayiinteractions_controller = (function () {
 			if (interactions && interactions.state.follow)
 				return true;
 
-			return false;			
+			return false;
 		},
 
 		hasDone: function () {
@@ -335,8 +342,8 @@ var neayiinteractions_controller = (function () {
 
 		/**
 		 * Prepare the click event that'll trigger the applause API
-		 * 
-		 * @param jQuery buttons list buttons 
+		 *
+		 * @param jQuery buttons list buttons
 		 */
 		setupApplauseButton: function (buttons) {
 			var self = this;
@@ -364,8 +371,8 @@ var neayiinteractions_controller = (function () {
 
 		/**
 		 * Sets the watch status on the buttons, and prepare the click event that'll trigger the watch API
-		 * 
-		 * @param jQuery buttons list buttons 
+		 *
+		 * @param jQuery buttons list buttons
 		 */
 		setupFollowButton: function (buttons) {
 			var self = this;
@@ -394,8 +401,8 @@ var neayiinteractions_controller = (function () {
 
 		/**
 		 * Prepare the click event that'll trigger the Done API
-		 * 
-		 * @param jQuery buttons list buttons 
+		 *
+		 * @param jQuery buttons list buttons
 		 */
 		setupDoneButton: function (buttons) {
 			var self = this;
@@ -521,7 +528,7 @@ var neayiinteractions_controller = (function () {
 			// Align the internal mediawiki status with the follow status:
 			var currentInternalFollowStatus = mw.config.get('mwInternalFollowStatus');
 			if (currentInternalFollowStatus != this.hasFollowed())
-			{				
+			{
 				var mwTitle = mw.config.get('wgRelevantPageName');
 
 				if (this.hasFollowed())
@@ -531,7 +538,7 @@ var neayiinteractions_controller = (function () {
 							mw.config.set('mwInternalFollowStatus', true);
 						})
 						.fail(function () {
-						});	
+						});
 				}
 				else
 				{
@@ -648,7 +655,7 @@ var neayiinteractions_controller = (function () {
 		clearSelect: function (selectId, label, value) {
 			$("#"+selectId + " option[value != '']").remove();
 		},
-		
+
 		addOptionToSelect: function (selectId, label, value) {
 			$('#'+selectId).append($( '<option>' ).attr("value", value).text(label));
 		},
@@ -755,7 +762,7 @@ var neayiinteractions_controller = (function () {
 			deptStats.sort(function(a, b) {
 				return b.count - a.count;
 			  });
-			
+
 			$( '#departments-stats' ).html('');
 
 			deptStats.slice(0, 5).forEach(function (e, i) {
@@ -834,7 +841,7 @@ var neayiinteractions_controller = (function () {
 			var CSConfig = mw.config.get('CommentStreams');
 			if (!CSConfig)
 				return;
-				
+
 			if ($('#side-map-svg').length > 0)
 				return this.refreshMap(deptStats);
 
@@ -857,7 +864,7 @@ var neayiinteractions_controller = (function () {
 				.attr('id', 'side-map-svg')
 				.attr('width', width)
 				.attr('height', height)
-				.attr('class', 'Greens');				
+				.attr('class', 'Greens');
 			const sideDeps = sideSvg.append('g');
 
 			var promises = [];
@@ -1021,7 +1028,7 @@ var neayiinteractions_controller = (function () {
 						self.logEvent('inpagemap_click', 'Clic sur la carte dans la marge', 'interaction_buttons');
 					});
 			});
-		}		
+		}
 
 	};
 }());
