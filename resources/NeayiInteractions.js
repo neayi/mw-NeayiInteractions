@@ -71,7 +71,7 @@ var neayiinteractions_controller = (function () {
 			$('#interaction-title').text(pageTitle);
 
 			if (views > 50)
-				$('<span class="page-views">' + views + '<i class="far fa-eye"></i></span>').insertAfter($('#interaction-title'));
+				$('<span class="page-views"><a href="/wiki/Special:PopularPages">' + views + '<i class="far fa-eye"></i></a></span>').insertAfter($('#interaction-title'));
 
 			// Copy the page menu in the new interaction bloc on the right
 			$('#p-contentnavigation').clone(true).appendTo("#neayi-interaction-desktop-menu").removeAttr('id');
