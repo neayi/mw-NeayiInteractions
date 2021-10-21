@@ -44,8 +44,7 @@ var neayiinteractions_controller = (function () {
 
 			mw.config.set('mwInternalFollowStatus', mw.config.get('NeayiInteractions').wgInitialFollowedStatus);
 
-			if ($('.portail').length > 0)
-				return;
+			this.setPortal();
 
 			this.setupDivs();
 
@@ -60,6 +59,25 @@ var neayiinteractions_controller = (function () {
 			if (element.length) {
 				$('html,body').animate({ scrollTop: element.offset().top - 50 }, 'slow');
 			}
+		},
+
+		/**
+		 * Look in the page for text and image to be put in the hero
+		 */
+		setPortal: function () {
+			var heroImage = $('img.portail-background');
+
+			if (heroImage.length == 0)
+				return;
+
+			var imageSrc = heroImage.first().attr('src');
+
+			$('#firstHeading').hide();
+			$('.hero-portail .hero-portail-img img').attr('src', imageSrc);
+
+			$('.hero-portail h1').text($('h1#firstHeading').text());
+			$('.hero-portail h2').text($('span.portal-subtitle').text());
+			$('.hero-portail').show();
 		},
 
 		setupDivs: function () {
@@ -93,6 +111,7 @@ var neayiinteractions_controller = (function () {
 				$('.comments-link').text('').prop('disabled', true);
 				$('.interaction-buttons').hide();
 				$('.interaction-links').hide();
+				$('.interaction-top').hide();
 			}
 			else {
 				// Enable the popover on the question marks in the modals
