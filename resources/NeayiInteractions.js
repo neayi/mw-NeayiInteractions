@@ -525,6 +525,8 @@ var neayiinteractions_controller = (function () {
 
 			if (applauses >= 1000)
 				applauses = String(Math.round(applauses / 100) / 10) + " k";
+			else if (applauses == 0)
+				applauses = "";
 
 			$('.neayi-interaction-applause').html(`<img src="${self.imagepath}clap.svg" width="28">`).prop("disabled", false);
 			$('.neayi-interaction-applause-label').text(applauses);
@@ -537,7 +539,10 @@ var neayiinteractions_controller = (function () {
 			if (interactions && interactions.counts.follow)
 				followers = interactions.counts.follow;
 
-			$( '.neayi-interaction-suivre-label' ).text(followers + " interessés");
+			if (followers == 0)
+				$( '.neayi-interaction-suivre-label' ).text("");
+			else
+				$( '.neayi-interaction-suivre-label' ).text(followers + " interessés");
 
 			if (this.hasFollowed())
 				$( '.neayi-interaction-suivre' ).html(`<span style="vertical-align: middle;">Suivi</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`).prop("disabled", false);
@@ -577,7 +582,9 @@ var neayiinteractions_controller = (function () {
 			if (interactions && interactions.counts.done)
 				doers = interactions.counts.done;
 
-			if (doers < 2)
+			if (doers = 2)
+				doers = "";
+			else if (doers < 2)
 				doers = doers + " exploitation";
 			else if (doers >= 1000)
 				doers = String(Math.round(doers / 100) / 10) + " k exploitations";
