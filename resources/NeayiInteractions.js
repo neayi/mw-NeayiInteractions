@@ -889,15 +889,13 @@ var neayiinteractions_controller = (function () {
 			const svg = d3.select('#map').append('svg')
 				.attr('id', 'map-svg')
 				.attr('width', width)
-				.attr('height', height)
-				.attr('class', 'Greens');
+				.attr('height', height);
 			const deps = svg.append('g');
 
 			const sideSvg = d3.select('#side-map-container').append('svg')
 				.attr('id', 'side-map-svg')
 				.attr('width', width)
-				.attr('height', height)
-				.attr('class', 'Greens');
+				.attr('height', height);
 			const sideDeps = sideSvg.append('g');
 
 			var promises = [];
@@ -994,13 +992,15 @@ var neayiinteractions_controller = (function () {
 			var div = d3.select('body').append('div')
 				.attr('class', 'tooltip')
 				.style('opacity', 0);
+
+			$('.side-map-legend').show();
 		},
 
 		/**
 		 * Setup the d3js map as inspired from https://www.datavis.fr/index.php?page=map-population
 		 * @param {*} deptStats
 		 */
-		 refreshMap: function(deptStats) {
+		refreshMap: function(deptStats) {
 			var self = this;
 
 			var CSConfig = mw.config.get('CommentStreams');
