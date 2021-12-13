@@ -664,7 +664,13 @@ var neayiinteractions_controller = (function () {
 			});
 
 			self.setupDepartmentsStats(data.department);
-			self.setupMap(data.department);
+
+			// <span id="rex-departement" data-numero="81"></span>
+			var currentDept = false;
+			if ($("#rex-departement"))
+				currentDept = $("#rex-departement").data('numero');
+
+			self.setupMap(data.department, currentDept);
 			self.setupCharacteristicsStats('#famings-stats', data.characteristics.farming);
 			self.setupCharacteristicsStats('#cropping-systems-stats', data.characteristics.croppingSystem);
 
@@ -853,8 +859,9 @@ var neayiinteractions_controller = (function () {
 		/**
 		 * Setup the d3js map as inspired from https://www.datavis.fr/index.php?page=map-population
 		 * @param {*} deptStats
+		 * @package {*} currentDept false or a number of the current dept to highlight
 		 */
-		setupMap: function(deptStats) {
+		setupMap: function(deptStats, currentDept) {
 			var self = this;
 
 			var CSConfig = mw.config.get('CommentStreams');
@@ -906,6 +913,15 @@ var neayiinteractions_controller = (function () {
 					.attr('id', d => 'side-d' + d.properties.CODE_DEPT)
 					.attr('d', path);
 
+				if (currentDept)
+				{
+					d3.select('#d' + currentDept)
+					  .attr('class', d => 'current');
+
+					d3.select('#side-d' + currentDept)
+					  .attr('class', d => 'current');
+				}
+
 				// On calcule le max de la population pour adapter les couleurs
 				var quantile = d3.scaleQuantile()
 					.domain([0, d3.max(deptStats, e => +e.count)])
@@ -913,8 +929,12 @@ var neayiinteractions_controller = (function () {
 
 				deptStats.forEach(function (e, i) {
 
+					var strClass = 'department q' + quantile(+e.count) + '-9';
+					if (currentDept && currentDept == e.department_number)
+						strClass = 'department current q' + quantile(+e.count) + '-9';
+
 					d3.select('#d' + e.department_number)
-						.attr('class', d => 'department q' + quantile(+e.count) + '-9')
+						.attr('class', d => strClass)
 						.on('mouseover', function (d) {
 							div.transition()
 								.duration(200)
@@ -938,7 +958,7 @@ var neayiinteractions_controller = (function () {
 						});
 
 					d3.select('#side-d' + e.department_number)
-						.attr('class', d => 'department q' + quantile(+e.count) + '-9')
+						.attr('class', d => strClass)
 						.on('mouseover', function (d) {
 							div.transition()
 								.duration(200)
