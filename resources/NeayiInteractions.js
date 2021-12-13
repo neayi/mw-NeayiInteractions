@@ -913,6 +913,8 @@ var neayiinteractions_controller = (function () {
 					.attr('id', d => 'side-d' + d.properties.CODE_DEPT)
 					.attr('d', path);
 
+					currentDept = 21;
+
 				if (currentDept)
 				{
 					d3.select('#d' + currentDept)
