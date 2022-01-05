@@ -921,10 +921,38 @@ var neayiinteractions_controller = (function () {
 				if (currentDept)
 				{
 					d3.select('#d' + currentDept)
-					  .attr('class', d => 'current');
+					  .attr('class', d => 'current')
+					  .on('mouseover', function (d) {
+						div.transition()
+							.duration(200)
+							.style('opacity', 1);
+						div.html('Département concerné par cette page')
+							.style('left', (d3.event.pageX + 30) + 'px')
+							.style('top', (d3.event.pageY - 30) + 'px');
+					})
+					.on('mouseout', function (d) {
+						div.style('opacity', 0);
+						div.html('')
+							.style('left', '-500px')
+							.style('top', '-500px');
+					});
 
 					d3.select('#side-d' + currentDept)
-					  .attr('class', d => 'current');
+					  .attr('class', d => 'current')
+					  .on('mouseover', function (d) {
+						  div.transition()
+							  .duration(200)
+							  .style('opacity', 1);
+						  div.html('Département concerné par cette page')
+							  .style('left', (d3.event.pageX + 30) + 'px')
+							  .style('top', (d3.event.pageY - 30) + 'px');
+					  })
+					  .on('mouseout', function (d) {
+						  div.style('opacity', 0);
+						  div.html('')
+							  .style('left', '-500px')
+							  .style('top', '-500px');
+					  });
 				}
 
 				// On calcule le max de la population pour adapter les couleurs
