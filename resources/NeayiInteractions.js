@@ -131,6 +131,10 @@ var neayiinteractions_controller = (function () {
 				this.setupApplauseButton($('.neayi-interaction-applause'));
 				this.setupDoneButton($('.neayi-interaction-doneit'));
 
+				// If there's an interaction bloc inside the page, add the buttons now
+				if ($('.interaction-bloc-inside'))
+					$('.interaction-bloc .interaction-buttons .row').clone(true).appendTo(".interaction-bloc-inside .interaction-top .interaction-buttons");
+
 				this.setupCommentsButton();
 			}
 
