@@ -46,6 +46,8 @@ var neayiinteractions_controller = (function () {
 
 			this.setPortal();
 
+			this.setupShareLinks();
+
 			this.setupDivs();
 
 			this.getInitialCounts();
@@ -190,6 +192,20 @@ var neayiinteractions_controller = (function () {
 			{
 				fbq('trackCustom', name);
 			}
+		},
+
+		/**
+		 * Log an event to Google Analytics and facebook
+		 * @param String name
+		 * @param String label
+		 * @param String category
+		 */
+		setupShareLinks: function() {
+			var mwTitle = mw.config.get('wgTitle');
+
+			$('.share-facebook').attr('href', 'https://www.facebook.com/dialog/share?app_id=350418335947147&display=page&href=' + window.location);
+			$('.share-twitter').attr('href', 'https://twitter.com/intent/tweet?text=' + mwTitle + " @TriplePerforma1 " + window.location);
+			$('.share-whatsapp').attr('href', 'whatsapp://send?text=' + mwTitle + " " + window.location);
 		},
 
 		/**
