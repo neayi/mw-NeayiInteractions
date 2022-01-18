@@ -54,6 +54,8 @@ var neayiinteractions_controller = (function () {
 
 			this.loadStats();
 			this.loadCommunity('');
+
+			console.log("Neayi interactions setup done");
 		},
 
 		scrollToAnchor: function (id) {
@@ -89,6 +91,7 @@ var neayiinteractions_controller = (function () {
 			var views = mw.config.get('NeayiInteractions').wgPageViews;
 
 			$('#interaction-title').text(pageTitle);
+			$('.title-sticky p').text(pageTitle);
 
 			if (views > 50)
 				$('<span class="page-views"><a href="/wiki/Special:PopularPages">' + views + '<i class="far fa-eye"></i></a></span>').insertAfter($('#interaction-title'));
@@ -206,6 +209,7 @@ var neayiinteractions_controller = (function () {
 			var mwTitle = mw.config.get('wgTitle');
 			var self = this;
 			self.share_buttons_animation = 'off';
+			self.title_animation = 'off';
 
 			$('.share-facebook').attr('href', 'https://www.facebook.com/dialog/share?app_id=350418335947147&display=page&href=' + window.location)
 								.on('click', function (e) {
@@ -222,14 +226,50 @@ var neayiinteractions_controller = (function () {
 
 			var threshold = Math.min($('.social-sticky').next().position().top - $(window).height(), 500);
 			$(window).scroll(function() {
-				console.log($(window).scrollTop()  + " " + $('.social-sticky').next().position().top / 2 + " " + self.share_buttons_animation);
+
+				if($(window).scrollTop() > 250)
+				{
+					if ($('.title-sticky').css('opacity') == 0 &&
+						self.title_animation != 'on')
+					{
+						self.title_animation = 'on';
+						$('.title-sticky').animate({
+								opacity: 1,
+								top: '0px',
+								height: '52px'
+							},
+							{
+								complete: function(){
+									self.title_animation = 'off';
+								}
+							});
+					}
+				}
+				else
+				{
+					if ($('.title-sticky').css('opacity') > 0 &&
+						self.title_animation != 'on')
+					{
+						self.title_animation = 'on';
+						$('.title-sticky').animate({
+								opacity: 0,
+								top: '-50px',
+								height: 0
+							},
+							{
+								complete: function(){
+									self.title_animation = 'off';
+
+								}
+							});
+					}
+				}
 
 				if($(window).scrollTop() > threshold)
 				{
 					if ($('.social-sticky').css('opacity') == 0 &&
 						self.share_buttons_animation != 'on')
 					{
-						console.log("Showing social-stick");
 						self.share_buttons_animation = 'on';
 						$('.social-sticky').animate({
 								opacity: 1,
@@ -247,7 +287,6 @@ var neayiinteractions_controller = (function () {
 					if ($('.social-sticky').css('opacity') > 0 &&
 						self.share_buttons_animation != 'on')
 					{
-						console.log("Hiding social-stick");
 						self.share_buttons_animation = 'on';
 						$('.social-sticky').animate({
 								opacity: 0,
@@ -261,8 +300,6 @@ var neayiinteractions_controller = (function () {
 					}
 				}
 			});
-
-			console.log("Setup done");
 		},
 
 		setupInPageInteractionBloc: function() {
