@@ -133,9 +133,7 @@ var neayiinteractions_controller = (function () {
 				this.setupApplauseButton($('.neayi-interaction-applause'));
 				this.setupDoneButton($('.neayi-interaction-doneit'));
 
-				// If there's an interaction bloc inside the page, add the buttons now
-				if ($('.interaction-bloc-inside'))
-					$('.interaction-bloc .interaction-buttons .row').clone(true).appendTo(".interaction-bloc-inside .interaction-top .interaction-buttons");
+				this.setupInPageInteractionBloc();
 
 				this.setupCommentsButton();
 			}
@@ -192,6 +190,10 @@ var neayiinteractions_controller = (function () {
 			{
 				fbq('trackCustom', name);
 			}
+
+			if ((typeof fbq !== 'function') ||
+				(typeof gtag !== 'function'))
+				console.log('Log event: ' + name + " " + label + " " + category);
 		},
 
 		/**
@@ -202,10 +204,41 @@ var neayiinteractions_controller = (function () {
 		 */
 		setupShareLinks: function() {
 			var mwTitle = mw.config.get('wgTitle');
+			var self = this;
 
-			$('.share-facebook').attr('href', 'https://www.facebook.com/dialog/share?app_id=350418335947147&display=page&href=' + window.location);
-			$('.share-twitter').attr('href', 'https://twitter.com/intent/tweet?text=' + mwTitle + " @TriplePerforma1 " + window.location);
-			$('.share-whatsapp').attr('href', 'whatsapp://send?text=' + mwTitle + " " + window.location);
+			$('.share-facebook').attr('href', 'https://www.facebook.com/dialog/share?app_id=350418335947147&display=page&href=' + window.location)
+								.on('click', function (e) {
+									self.logEvent('Partage facebook', 'Partage sur facebook', 'share_buttons');
+								});
+			$('.share-twitter').attr('href', 'https://twitter.com/intent/tweet?text=' + mwTitle + " @TriplePerforma1 " + window.location)
+								.on('click', function (e) {
+									self.logEvent('Partage twitter', 'Partage sur twitter', 'share_buttons');
+								});
+			$('.share-whatsapp').attr('href', 'whatsapp://send?text=' + mwTitle + " " + window.location)
+								.on('click', function (e) {
+									self.logEvent('Partage whatsapp', 'Partage sur whatsapp', 'share_buttons');
+								});
+		},
+
+		setupInPageInteractionBloc: function() {
+
+			if ($('.interaction-bloc-inside').length == 0)
+			{
+				$('#bodyContent').append($(`<div class="interaction-bloc-inside">
+						<div class="interaction-top">
+
+						Si cet article vous a plu, n'oubliez pas de l'applaudir en cliquant ci-dessous.
+						Pour rester informé des évolutions qui lui seront apportées, cliquez sur "Suivre".
+						Et si vous voulez partager votre expérience avec la communauté autour de ce sujet, cliquez sur "Je le fais".
+
+						<div class="container px-0 interaction-buttons">
+
+						</div></div></div>`));
+			}
+
+			// If there's an interaction bloc inside the page, add the buttons now
+			if ($('.interaction-bloc-inside').length > 0)
+				$('.interaction-bloc .interaction-buttons .row').clone(true).appendTo(".interaction-bloc-inside .interaction-top .interaction-buttons");
 		},
 
 		/**
