@@ -205,6 +205,7 @@ var neayiinteractions_controller = (function () {
 		setupShareLinks: function() {
 			var mwTitle = mw.config.get('wgTitle');
 			var self = this;
+			self.share_buttons_animation = 'off';
 
 			$('.share-facebook').attr('href', 'https://www.facebook.com/dialog/share?app_id=350418335947147&display=page&href=' + window.location)
 								.on('click', function (e) {
@@ -218,6 +219,50 @@ var neayiinteractions_controller = (function () {
 								.on('click', function (e) {
 									self.logEvent('Partage whatsapp', 'Partage sur whatsapp', 'share_buttons');
 								});
+
+			var threshold = Math.min($('.social-sticky').next().position().top - $(window).height(), 500);
+			$(window).scroll(function() {
+				console.log($(window).scrollTop()  + " " + $('.social-sticky').next().position().top / 2 + " " + self.share_buttons_animation);
+
+				if($(window).scrollTop() > threshold)
+				{
+					if ($('.social-sticky').css('opacity') == 0 &&
+						self.share_buttons_animation != 'on')
+					{
+						console.log("Showing social-stick");
+						self.share_buttons_animation = 'on';
+						$('.social-sticky').animate({
+								opacity: 1,
+								height: 'show'
+							},
+							{
+								complete: function(){
+									self.share_buttons_animation = 'off';
+								}
+							});
+					}
+				}
+				else
+				{
+					if ($('.social-sticky').css('opacity') > 0 &&
+						self.share_buttons_animation != 'on')
+					{
+						console.log("Hiding social-stick");
+						self.share_buttons_animation = 'on';
+						$('.social-sticky').animate({
+								opacity: 0,
+								height: 'hide'
+							},
+							{
+								complete: function(){
+									self.share_buttons_animation = 'off';
+								}
+							});
+					}
+				}
+			});
+
+			console.log("Setup done");
 		},
 
 		setupInPageInteractionBloc: function() {
@@ -227,9 +272,9 @@ var neayiinteractions_controller = (function () {
 				$('#bodyContent').append($(`<div class="interaction-bloc-inside">
 						<div class="interaction-top">
 
-						Si cet article vous a plu, n'oubliez pas de l'applaudir en cliquant ci-dessous.
+						<p>Si cet article vous a plu, n'oubliez pas de l'applaudir en cliquant ci-dessous.
 						Pour rester informé des évolutions qui lui seront apportées, cliquez sur "Suivre".
-						Et si vous voulez partager votre expérience avec la communauté autour de ce sujet, cliquez sur "Je le fais".
+						Et si vous voulez partager votre expérience avec la communauté autour de ce sujet, cliquez sur "Je le fais".</p>
 
 						<div class="container px-0 interaction-buttons">
 
