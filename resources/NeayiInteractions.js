@@ -224,6 +224,21 @@ var neayiinteractions_controller = (function () {
 									self.logEvent('Partage whatsapp', 'Partage sur whatsapp', 'share_buttons');
 								});
 
+			if (navigator.share)
+			{
+				$('.share-share').on('click', function (e) {
+					e.preventDefault();
+					navigator.share({
+						title: mwTitle,
+					//	text: 'Hello World',
+						url: window.location,
+					});
+					self.logEvent('Partage whatsapp', 'Partage sur whatsapp', 'share_buttons');
+				});
+			}
+			else
+				$('.share-share').remove();
+
 			var threshold = Math.min($('.social-sticky').next().position().top - $(window).height(), 500);
 			$(window).scroll(function() {
 
