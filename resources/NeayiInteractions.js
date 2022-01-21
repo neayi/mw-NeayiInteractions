@@ -233,7 +233,7 @@ var neayiinteractions_controller = (function () {
 					//	text: 'Hello World',
 						url: window.location,
 					});
-					self.logEvent('Partage whatsapp', 'Partage sur whatsapp', 'share_buttons');
+					self.logEvent('Partage natif', 'Partage natif', 'share_buttons');
 				});
 			}
 			else
