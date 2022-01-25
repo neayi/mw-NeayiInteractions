@@ -91,7 +91,7 @@ var neayiinteractions_controller = (function () {
 			var views = mw.config.get('NeayiInteractions').wgPageViews;
 
 			$('#interaction-title').text(pageTitle);
-			$('.title-sticky p').text(pageTitle);
+			$('.title-sticky .sticky-title-span').text(pageTitle);
 
 			if (views > 50)
 				$('<span class="page-views"><a href="/wiki/Special:PopularPages">' + views + '<i class="far fa-eye"></i></a></span>').insertAfter($('#interaction-title'));
