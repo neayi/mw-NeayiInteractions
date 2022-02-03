@@ -90,6 +90,8 @@ var neayiinteractions_controller = (function () {
 			var relevantPageName = mw.config.get('wgRelevantPageName');
 			var views = mw.config.get('NeayiInteractions').wgPageViews;
 
+			this.setupSuggestionBox();
+
 			$('#interaction-title').text(pageTitle);
 			$('.title-sticky .sticky-title-span').text(pageTitle);
 
@@ -239,81 +241,144 @@ var neayiinteractions_controller = (function () {
 			else
 				$('.share-share').remove();
 
-			var threshold = Math.min($('.social-sticky').next().position().top - $(window).height(), 500);
 			$(window).scroll(function() {
+				if (self.title_animation == 'on')
+					return;
 
 				if($(window).scrollTop() > 250)
 				{
-					if ($('.title-sticky').css('opacity') == 0 &&
-						self.title_animation != 'on')
-					{
-						self.title_animation = 'on';
-						$('.title-sticky').animate({
-								opacity: 1,
-								top: '0px',
-								height: '52px'
-							},
-							{
-								complete: function(){
-									self.title_animation = 'off';
-								}
-							});
-					}
+					self.title_animation = 'on';
+					$('.title-sticky').animate({
+							opacity: 1,
+							top: '0px',
+							height: '52px'
+						},
+						{
+							complete: function(){
+								self.title_animation = 'off';
+							}
+						});
 				}
 				else
 				{
-					if ($('.title-sticky').css('opacity') > 0 &&
-						self.title_animation != 'on')
-					{
-						self.title_animation = 'on';
-						$('.title-sticky').animate({
-								opacity: 0,
-								top: '-50px',
-								height: 0
-							},
-							{
-								complete: function(){
-									self.title_animation = 'off';
+					self.title_animation = 'on';
+					$('.title-sticky').animate({
+							opacity: 0,
+							top: '-50px',
+							height: 0
+						},
+						{
+							complete: function(){
+								self.title_animation = 'off';
 
-								}
-							});
-					}
+							}
+						});
 				}
+			});
+
+			$(window).scroll(function() {
+				if (self.share_buttons_animation == 'on')
+					return;
+
+				var threshold = Math.min($('.social-sticky').next().position().top - $(window).height(), 500);
 
 				if($(window).scrollTop() > threshold)
 				{
-					if ($('.social-sticky').css('opacity') == 0 &&
-						self.share_buttons_animation != 'on')
-					{
-						self.share_buttons_animation = 'on';
-						$('.social-sticky').animate({
-								opacity: 1,
-								height: 'show'
-							},
-							{
-								complete: function(){
-									self.share_buttons_animation = 'off';
-								}
-							});
-					}
+					self.share_buttons_animation = 'on';
+					$('.social-sticky').animate({
+							opacity: 1,
+							height: 'show'
+						},
+						{
+							complete: function(){
+								self.share_buttons_animation = 'off';
+							}
+						});
 				}
 				else
 				{
-					if ($('.social-sticky').css('opacity') > 0 &&
-						self.share_buttons_animation != 'on')
-					{
-						self.share_buttons_animation = 'on';
-						$('.social-sticky').animate({
-								opacity: 0,
-								height: 'hide'
-							},
-							{
-								complete: function(){
-									self.share_buttons_animation = 'off';
-								}
-							});
-					}
+					self.share_buttons_animation = 'on';
+					$('.social-sticky').animate({
+							opacity: 0,
+							height: 'hide'
+						},
+						{
+							complete: function(){
+								self.share_buttons_animation = 'off';
+							}
+						});
 				}
+			});
+		},
+
+		setupSuggestionBox: function() {
+			var self = this;
+			self.suggestion_animation = 'off';
+
+			$('.feedback-tab').on('click', function (e) {
+				self.logEvent('Suggestion', 'Ouverture du volet suggestion', 'suggestion');
+				self.suggestion_animation = 'on';
+				$('.feedback-div').animate({
+					left: 0
+				},
+				{
+					complete: function(){
+						self.suggestion_animation = 'off';
+					}
+				});
+			});
+
+			$('.feedback-div-button button').on('click', function (e) {
+				self.logEvent('Suggestion', 'Click sur le bouton', 'suggestion');
+				window.open('https://forum.tripleperformance.fr/c/meta/articles-a-creer/38', '_blank');
+			});
+
+			$('.feedback-div').on('mouseleave', function (e) {
+				self.suggestion_animation = 'on';
+				$('.feedback-div').animate({
+					left: '-178px'
+				},
+				{
+					complete: function(){
+						self.suggestion_animation = 'off';
+					}
+				});
+			});
+
+			$(window).scroll(function() {
+
+				if (self.suggestion_animation == 'on')
+					return;
+
+				var min_threshold = Math.min($('.social-sticky').next().position().top - $(window).height(), 500);
+				var max_threshold = $('.social-sticky').next().position().top - 800;
+
+				if($(window).scrollTop() > min_threshold &&
+				   $(window).scrollTop() < max_threshold)
+				{
+					self.suggestion_animation = 'on';
+					$('.feedback-div').animate({
+						left: '-178px'
+					},
+					{
+						complete: function(){
+							self.suggestion_animation = 'off';
+						}
+					});
+				}
+				else
+				{
+					self.suggestion_animation = 'on';
+					$('.feedback-div').animate({
+						left: '-226px'
+					},
+					{
+						complete: function(){
+							self.suggestion_animation = 'off';
+						}
+					});
+				}
+
 			});
 		},
 
