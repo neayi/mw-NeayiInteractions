@@ -330,7 +330,7 @@ var neayiinteractions_controller = (function () {
 
 			$('.feedback-div-button button').on('click', function (e) {
 				self.logEvent('Suggestion', 'Click sur le bouton', 'suggestion');
-				window.open('https://forum.tripleperformance.fr/c/meta/articles-a-creer/38', '_blank');
+				window.open('https://forum.tripleperformance.fr/c/meta/articles-a-creer/38?status=open', '_blank');
 			});
 
 			$('.feedback-div').on('mouseleave', function (e) {
