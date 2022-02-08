@@ -213,15 +213,25 @@ var neayiinteractions_controller = (function () {
 			self.share_buttons_animation = 'off';
 			self.title_animation = 'off';
 
-			$('.share-facebook').attr('href', 'https://www.facebook.com/dialog/share?app_id=350418335947147&display=page&href=' + window.location)
+			var pageUTM = '';
+			if (window.location.href.match(/\?/))
+				pageUTM = "&utm_medium=tp_share_button&utm_campaign=share_buttons";
+			else
+				pageUTM = "?utm_medium=tp_share_button&utm_campaign=share_buttons";
+
+			var facebookURL = encodeURIComponent(window.location.href + pageUTM + "&utm_source=facebook");
+			var twitterURL = encodeURIComponent(window.location.href + pageUTM + "&utm_source=twitter");
+			var whatsappURL = encodeURIComponent(window.location.href + pageUTM + "&utm_source=whatsapp");
+
+			$('.share-facebook').attr('href', 'https://www.facebook.com/dialog/share?app_id=350418335947147&display=page&href=' + facebookURL)
 								.on('click', function (e) {
 									self.logEvent('Partage facebook', 'Partage sur facebook', 'share_buttons');
 								});
-			$('.share-twitter').attr('href', 'https://twitter.com/intent/tweet?text=' + mwTitle + " @TriplePerforma1 " + window.location)
+			$('.share-twitter').attr('href', 'https://twitter.com/intent/tweet?text=' + mwTitle + " @TriplePerforma1 " + twitterURL)
 								.on('click', function (e) {
 									self.logEvent('Partage twitter', 'Partage sur twitter', 'share_buttons');
 								});
-			$('.share-whatsapp').attr('href', 'whatsapp://send?text=' + mwTitle + " " + window.location)
+			$('.share-whatsapp').attr('href', 'whatsapp://send?text=' + mwTitle + " " + whatsappURL)
 								.on('click', function (e) {
 									self.logEvent('Partage whatsapp', 'Partage sur whatsapp', 'share_buttons');
 								});
@@ -233,7 +243,7 @@ var neayiinteractions_controller = (function () {
 					navigator.share({
 						title: mwTitle,
 					//	text: 'Hello World',
-						url: window.location,
+						url: window.location.href + pageUTM + "&utm_source=native",
 					});
 					self.logEvent('Partage natif', 'Partage natif', 'share_buttons');
 				});
