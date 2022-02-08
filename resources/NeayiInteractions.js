@@ -924,6 +924,9 @@ var neayiinteractions_controller = (function () {
 
 				var context = user['context'];
 
+				if (context['structure'] == 'Triple Performance')
+					return;
+
 				var subTitle = context['sector'];
 				if (context['structure'] != '')
 					subTitle = subTitle + ' (<a href="/wiki/Structure:'+context['structure']+'">'+context['structure']+'</a>)';
