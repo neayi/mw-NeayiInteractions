@@ -323,72 +323,9 @@ var neayiinteractions_controller = (function () {
 
 		setupSuggestionBox: function() {
 			var self = this;
-			self.suggestion_animation = 'off';
 
-			$('.feedback-tab').on('click', function (e) {
-				self.logEvent('Suggestion', 'Ouverture du volet suggestion', 'suggestion');
-				self.suggestion_animation = 'on';
-				$('.feedback-div').animate({
-					left: 0
-				},
-				{
-					complete: function(){
-						self.suggestion_animation = 'off';
-					}
-				});
-			});
-
-			$('.feedback-div-button button').on('click', function (e) {
+			$('.suggest-button').on('click', function (e) {
 				self.logEvent('Suggestion', 'Click sur le bouton', 'suggestion');
-				window.open('https://forum.tripleperformance.fr/c/meta/articles-a-creer/38?status=open', '_blank');
-			});
-
-			$('.feedback-div').on('mouseleave', function (e) {
-				self.suggestion_animation = 'on';
-				$('.feedback-div').animate({
-					left: '-178px'
-				},
-				{
-					complete: function(){
-						self.suggestion_animation = 'off';
-					}
-				});
-			});
-
-			$(window).scroll(function() {
-
-				if (self.suggestion_animation == 'on')
-					return;
-
-				var min_threshold = Math.min($('.social-sticky').next().position().top - $(window).height(), 500);
-				var max_threshold = $('.social-sticky').next().position().top - 800;
-
-				if($(window).scrollTop() > min_threshold &&
-				   $(window).scrollTop() < max_threshold)
-				{
-					self.suggestion_animation = 'on';
-					$('.feedback-div').animate({
-						left: '-178px'
-					},
-					{
-						complete: function(){
-							self.suggestion_animation = 'off';
-						}
-					});
-				}
-				else
-				{
-					self.suggestion_animation = 'on';
-					$('.feedback-div').animate({
-						left: '-226px'
-					},
-					{
-						complete: function(){
-							self.suggestion_animation = 'off';
-						}
-					});
-				}
-
 			});
 		},
 
