@@ -744,7 +744,7 @@ var neayiinteractions_controller = (function () {
 			if (interactions && interactions.counts.done)
 				doers = interactions.counts.done;
 
-			if (doers = 2)
+			if (doers == 2)
 				doers = "";
 			else if (doers < 2)
 				doers = doers + " exploitation";
