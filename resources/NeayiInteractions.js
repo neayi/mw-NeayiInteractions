@@ -772,6 +772,11 @@ var neayiinteractions_controller = (function () {
 						labelMarkAsDone = "J'en ai";
 						break;
 
+					case 'Matériel':
+						labelDone = "Je l'ai !";
+						labelMarkAsDone = "Je l'ai";
+						break;
+
 					default:
 						break;
 				}
