@@ -55,6 +55,8 @@ var neayiinteractions_controller = (function () {
 			this.loadStats();
 			this.loadCommunity('');
 
+			this.hideOverflownCards();
+
 			console.log("Neayi interactions setup done");
 		},
 
@@ -438,6 +440,51 @@ var neayiinteractions_controller = (function () {
 				else
 				{
 					$( '#load-more-community' ).hide().attr('href', '');
+				}
+			});
+		},
+
+		/**
+		 * On pages with the template "Pages liées", we hide cards over 6 cards, and show a "see more" button
+		 */
+		hideOverflownCards: function () {
+
+			var self = this;
+
+			$('div.voir-plus').each(function( index ) {
+				var buttonParentDiv = $(this);
+
+				var cards = buttonParentDiv.parent().children();
+
+				if (cards.length > 7) // 6 + 1
+				{
+					for (let index = 6; index < cards.length; index++) {
+						var card = $(cards[index]);
+
+						if (card.hasClass('voir-plus'))
+							break;
+
+						card.hide();
+					}
+
+					// Now add a button to toggle the visibility
+					buttonParentDiv.html( `<button type="button" class="btn btn-sm btn-outline-primary voir-plus-button">Voir plus</button>` );
+				}
+			  });
+
+			// Add an event to those buttons in order to show all the cards now.
+			$('button.voir-plus-button').on('click', function (e) {
+				self.logEvent('seemore_click', 'Clic sur "Voir plus"', 'page_buttons');
+
+				var buttonParentDiv = $(this).parent();
+				var cards = buttonParentDiv.parent().children();
+				for (let index = 6; index < cards.length; index++) {
+					var card = $(cards[index]);
+
+					if (card.hasClass('voir-plus'))
+						break;
+
+					card.show();
 				}
 			});
 		},
