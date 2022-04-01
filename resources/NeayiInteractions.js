@@ -486,6 +486,8 @@ var neayiinteractions_controller = (function () {
 
 					card.show();
 				}
+
+				buttonParentDiv.hide();
 			});
 		},
 
