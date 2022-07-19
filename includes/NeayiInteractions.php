@@ -106,24 +106,6 @@ class NeayiInteractions {
 			return false;
 		}
 
-		// if $wgNeayiInteractionsAllowedNamespaces is not set, display comments
-		// in all content namespaces and if set to -1, don't display comments
-		$config = $output->getConfig();
-		$niAllowedNamespaces = $config->get( 'NeayiInteractionsAllowedNamespaces' );
-		if ( $niAllowedNamespaces === null ) {
-			$niAllowedNamespaces = $config->get( 'ContentNamespaces' );
-		} elseif ( $niAllowedNamespaces === self::INTERACTIONS_DISABLED ) {
-			return false;
-		} elseif ( !is_array( $niAllowedNamespaces ) ) {
-			$niAllowedNamespaces = [ $niAllowedNamespaces ];
-		}
-
-		// only display comments in subject namespaces in the list of allowed
-		// namespaces
-		if ( !in_array( $namespace, $niAllowedNamespaces ) ) {
-			return false;
-		}
-
 		return true;
 	}
 

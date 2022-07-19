@@ -616,12 +616,40 @@ var neayiinteractions_controller = (function () {
 				}
 
 				self.disableButton(buttons);
+				var api = new mw.Api();
+				var pageId = mw.config.get('wgArticleId');
 
 				if (self.hasFollowed()) {
 					self.ajaxInsights(['unfollow']);
+
+					api.post( {
+						action: 'csunwatch',
+						pageid: pageId,
+						token: mw.user.tokens.get( 'csrfToken' )
+					} )
+					.done( function ( data ) {
+						console.log( data );
+					} )
+					.fail( function ( data ) {
+						console.log( "Failed to csunwatch" );
+						console.log( data );
+					} );
 				}
 				else {
 					self.ajaxInsights(['follow']);
+
+					api.post( {
+						action: 'cswatch',
+						pageid: pageId,
+						token: mw.user.tokens.get( 'csrfToken' )
+					} )
+					.done( function ( data ) {
+						console.log( data );
+					} )
+					.fail( function ( data ) {
+						console.log( "Failed to cswatch" );
+						console.log( data );
+					} );
 				}
 
 				e.preventDefault();
@@ -658,16 +686,36 @@ var neayiinteractions_controller = (function () {
 					buttons.prop("disabled", false);
 
 					$('#tellUsMoreModalSubmit').on('click', function (e) {
+						e.preventDefault();
+
 						var actions = ['done'];
 						if ($('#followwheck').val() == "follow")
+						{
+							// The user has clicked on the "follow the page" checkbox
 							actions = ['done', 'follow'];
+
+							var api = new mw.Api();
+							var pageId = mw.config.get('wgArticleId');
+
+							api.post( {
+								action: 'cswatch',
+								pageid: pageId,
+								token: mw.user.tokens.get( 'csrfToken' )
+							} )
+							.done( function ( data ) {
+								console.log( data );
+							} )
+							.fail( function ( data ) {
+								console.log( "Failed to cswatch" );
+								console.log( data );
+							} );
+						}
 
 						var otherparams = {};
 						otherparams.start_at = $('#sinceInputId').val() + "-01-01";
 
 						self.ajaxInsights(actions, otherparams);
 
-						e.preventDefault();
 						$('#tellUsMoreModal').modal('hide');
 					});
 
