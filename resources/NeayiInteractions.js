@@ -333,6 +333,10 @@ var neayiinteractions_controller = (function () {
 
 		setupInPageInteractionBloc: function() {
 
+			var wikisearch = $('#app > .wikisearch');
+			if (wikisearch)
+				return;
+
 			if ($('.interaction-bloc-inside').length == 0)
 			{
 				$('#bodyContent').append($(`<div class="interaction-bloc-inside">
@@ -356,6 +360,10 @@ var neayiinteractions_controller = (function () {
 		 * Get the initial counts from insights
 		 */
 		getInitialCounts: function () {
+			var wikisearch = $('#app > .wikisearch');
+			if (wikisearch)
+				return;
+
 			var self = this;
 			var sessionId = mw.config.get('NeayiInteractions').wgUserSessionId;
 			var pageId = mw.config.get('wgArticleId');
@@ -384,6 +392,10 @@ var neayiinteractions_controller = (function () {
 		 * Load the community from insights
 		 */
 		loadCommunity: function (url = '') {
+			var wikisearch = $('#app > .wikisearch');
+			if (wikisearch)
+				return;
+
 			var self = this;
 
 			// Check if connected:
@@ -495,6 +507,10 @@ var neayiinteractions_controller = (function () {
 		 * Load the stats from insights
 		 */
 		loadStats: function () {
+			var wikisearch = $('#app > .wikisearch');
+			if (wikisearch)
+				return;
+
 			var self = this;
 			var pageId = mw.config.get('wgArticleId');
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
