@@ -334,7 +334,7 @@ var neayiinteractions_controller = (function () {
 		setupInPageInteractionBloc: function() {
 
 			var wikisearch = $('#app > .wikisearch');
-			if (wikisearch)
+			if (wikisearch.length > 0)
 				return;
 
 			if ($('.interaction-bloc-inside').length == 0)
@@ -361,7 +361,7 @@ var neayiinteractions_controller = (function () {
 		 */
 		getInitialCounts: function () {
 			var wikisearch = $('#app > .wikisearch');
-			if (wikisearch)
+			if (wikisearch.length > 0)
 				return;
 
 			var self = this;
@@ -393,7 +393,7 @@ var neayiinteractions_controller = (function () {
 		 */
 		loadCommunity: function (url = '') {
 			var wikisearch = $('#app > .wikisearch');
-			if (wikisearch)
+			if (wikisearch.length > 0)
 				return;
 
 			var self = this;
@@ -508,7 +508,7 @@ var neayiinteractions_controller = (function () {
 		 */
 		loadStats: function () {
 			var wikisearch = $('#app > .wikisearch');
-			if (wikisearch)
+			if (wikisearch.length > 0)
 				return;
 
 			var self = this;
