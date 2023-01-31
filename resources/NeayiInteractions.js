@@ -1054,7 +1054,7 @@ var neayiinteractions_controller = (function () {
 			$( divId + ' .stats-icons' ).html('');
 
 			characteristicsStats.slice(0, 5).forEach(function (e, i) {
-				var iconURL = insightsURL + 'api/icon/' . e.uuid + '/90';
+				var iconURL = insightsURL + 'api/icon/' + e.uuid + '/90';
 				$( divId + ' .stats-icons' )
 					.append( $(`<div class="caracteristique-exploitation">
 									<div>
