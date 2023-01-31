@@ -117,8 +117,8 @@ var neayiinteractions_controller = (function () {
 			$('a.login-links').attr('href', '/index.php?title=Special:Login&returnto=' + relevantPageName);
 
 			// Check if comments are enabled on the page. If not, we disable all interactions.
-			var CSConfig = mw.config.get('CommentStreams');
-			if (!CSConfig) {
+			var DIConfig = mw.config.get('DiscourseIntegration');
+			if (!DIConfig) {
 				$('.comments-link').text('').prop('disabled', true);
 				$('.interaction-buttons').hide();
 				$('.interaction-links').hide();
@@ -1098,8 +1098,8 @@ var neayiinteractions_controller = (function () {
 		setupMap: function(deptStats, currentDept) {
 			var self = this;
 
-			var CSConfig = mw.config.get('CommentStreams');
-			if (!CSConfig)
+			var DIConfig = mw.config.get('DiscourseIntegration');
+			if (!DIConfig)
 				return;
 
 			if ($('#side-map-svg').length > 0)
@@ -1258,8 +1258,8 @@ var neayiinteractions_controller = (function () {
 		refreshMap: function(deptStats) {
 			var self = this;
 
-			var CSConfig = mw.config.get('CommentStreams');
-			if (!CSConfig)
+			var DIConfig = mw.config.get('DiscourseIntegration');
+			if (!DIConfig)
 				return;
 
 			// On calcule le max de la population pour adapter les couleurs
