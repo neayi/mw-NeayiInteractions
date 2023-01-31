@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2016 The MITRE Corporation
+ * Copyright (c) 2023 Neayi SAS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -100,6 +100,8 @@ var neayiinteractions_controller = (function () {
 			if (views > 50)
 				$('<span class="page-views"><a href="/wiki/Special:PopularPages">' + views + '<i class="far fa-eye"></i></a></span>').insertAfter($('#interaction-title'));
 
+			// Remove the second edit button that feels weird (source code edition)
+			$('#ca-edit').remove();
 			// Copy the page menu in the new interaction bloc on the right
 			$('#p-contentnavigation').clone(true).appendTo("#neayi-interaction-desktop-menu").removeAttr('id');
 
@@ -141,8 +143,6 @@ var neayiinteractions_controller = (function () {
 				this.setupDoneButton($('.neayi-interaction-doneit'));
 
 				this.setupInPageInteractionBloc();
-
-				this.setupCommentsButton();
 			}
 
 			$( '#load-more-community' ).on('click', function (e) {
@@ -203,12 +203,6 @@ var neayiinteractions_controller = (function () {
 				console.log('Log event: ' + name + " " + label + " " + category);
 		},
 
-		/**
-		 * Log an event to Google Analytics and facebook
-		 * @param String name
-		 * @param String label
-		 * @param String category
-		 */
 		setupShareLinks: function() {
 			var mwTitle = mw.config.get('wgTitle');
 			var self = this;
@@ -341,14 +335,10 @@ var neayiinteractions_controller = (function () {
 			{
 				$('#bodyContent').append($(`<div class="interaction-bloc-inside">
 						<div class="interaction-top">
-
-						<p>Si cet article vous a plu, n'oubliez pas de l'applaudir en cliquant ci-dessous.
-						Pour rester informé des évolutions qui lui seront apportées, cliquez sur "Suivre".
-						Et si vous voulez partager votre expérience avec la communauté autour de ce sujet, cliquez sur "Je le fais".</p>
-
-						<div class="container px-0 interaction-buttons">
-
-						</div></div></div>`));
+							<p>` + mw.msg('neayiinteractions-footer-text') + `</p>
+							<div class="container px-0 interaction-buttons"></div>
+						</div>
+					</div>`));
 			}
 
 			// If there's an interaction bloc inside the page, add the buttons now
@@ -480,7 +470,7 @@ var neayiinteractions_controller = (function () {
 					}
 
 					// Now add a button to toggle the visibility
-					buttonParentDiv.html( `<button type="button" class="btn btn-sm btn-outline-primary voir-plus-button">Voir plus</button>` );
+					buttonParentDiv.html( `<button type="button" class="btn btn-sm btn-outline-primary voir-plus-button">` +mw.msg('neayiinteractions-see-more')+ `</button>` );
 				}
 			  });
 
@@ -744,51 +734,6 @@ var neayiinteractions_controller = (function () {
 
 		},
 
-		/**
-		 * Enable and add an event on the comments button, if the comments are enabled on the page
-		 * Set the label with the number of existing comments
-		 */
-		setupCommentsButton: function () {
-			var CSConfig = mw.config.get('CommentStreams');
-			var self = this;
-
-			if (!CSConfig) {
-				$('.comments-link').text('').prop('disabled', true);
-				return;
-			}
-
-			if (CSConfig.comments && CSConfig.comments.length > 0) {
-				// When we click on the "N questions" link, we scroll down the page to the comments.
-				// Todo: if comments are disabled on the page, we should remove this interaction!
-				$('.comments-link').on('click', function () {
-					self.scrollToAnchor('cs-comments');
-					window.location.hash = '#cs-comments';
-					self.logEvent('see_comments_click', 'Clic sur "Voir les commentaires"', 'interaction_buttons');
-				});
-
-				// Now change the label
-				var nbQuestionsAvecReponses = 0;
-				var parentIndex;
-
-				for (parentIndex in CSConfig.comments) {
-					var parentComment = CSConfig.comments[parentIndex];
-					if (parentComment.children)
-						nbQuestionsAvecReponses++;
-				}
-
-				var label = $( '.questions-text' );
-
-				if (nbQuestionsAvecReponses == 1)
-					label.text("1 question avec réponses");
-				else if (nbQuestionsAvecReponses > 0)
-					label.text(nbQuestionsAvecReponses + " questions avec réponses");
-				else if (CSConfig.comments.length == 1)
-					label.text("1 question");
-				else
-					label.text(CSConfig.comments.length + " questions");
-			}
-		},
-
 		setApplauseLabels: function () {
 			var self = this;
 
@@ -817,12 +762,12 @@ var neayiinteractions_controller = (function () {
 			if (followers == 0)
 				$( '.neayi-interaction-suivre-label' ).text("");
 			else
-				$( '.neayi-interaction-suivre-label' ).text(followers + " interessés");
+				$( '.neayi-interaction-suivre-label' ).text(mw.msg('neayiinteractions-interested-count', followers));
 
 			if (this.hasFollowed())
-				$( '.neayi-interaction-suivre' ).html(`<span style="vertical-align: middle;">Suivi</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`).prop("disabled", false);
+				$( '.neayi-interaction-suivre' ).html(`<span style="vertical-align: middle;">` + mw.msg('neayiinteractions-followed') + `</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`).prop("disabled", false);
 			else
-				$( '.neayi-interaction-suivre' ).text("Suivre").prop("disabled", false);
+				$( '.neayi-interaction-suivre' ).text(mw.msg('neayiinteractions-follow')).prop("disabled", false);
 
 			// Align the internal mediawiki status with the follow status:
 			var currentInternalFollowStatus = mw.config.get('mwInternalFollowStatus');
@@ -859,35 +804,33 @@ var neayiinteractions_controller = (function () {
 
 			if (doers == 0)
 				doers = "";
-			else if (doers < 2)
-				doers = doers + " exploitation";
 			else if (doers >= 1000)
-				doers = String(Math.round(doers / 100) / 10) + " k exploitations";
+				doers = mw.msg('neayiinteractions-nk-doers', String(Math.round(doers / 100) / 10));
 			else
-				doers = doers + " exploitations";
+				doers = mw.msg('neayiinteractions-n-doers', doers);
 
 			$( '.neayi-interaction-doneit-label' ).text(doers);
 
-			var labelDone = "Fait !";
-			var labelMarkAsDone = "Je le fais";
+			var labelDone = mw.msg('neayiinteractions-done-it-confirmed'); // "Fait !";
+			var labelMarkAsDone = mw.msg('neayiinteractions-I-do-it'); // "Je le fais";
 
 			if ($( '#neayi-type-page' ))
 			{
 				var typePage = $( '#neayi-type-page' ).text();
 				switch (typePage) {
 					case 'Production':
-						labelDone = "Fait !";
-						labelMarkAsDone = "J'en fais";
+						labelDone = mw.msg('neayiinteractions-done-it-confirmed'); // "Fait !";
+						labelMarkAsDone = mw.msg('neayiinteractions-I-do-it-production'); // "J'en fais";
 						break;
 
 					case 'Ravageur':
-						labelDone = "J'en ai !";
-						labelMarkAsDone = "J'en ai";
+						labelDone = mw.msg('neayiinteractions-have-some-confirmed'); // "J'en ai !";
+						labelMarkAsDone = mw.msg('neayiinteractions-I-have-some'); // "J'en ai";
 						break;
 
 					case 'Matériel':
-						labelDone = "Je l'ai !";
-						labelMarkAsDone = "Je l'ai";
+						labelDone = mw.msg('neayiinteractions-have-it-confirmed'); // "Je l'ai !";
+						labelMarkAsDone = mw.msg('neayiinteractions-I-have-it'); // "Je l'ai";
 						break;
 
 					default:
@@ -904,7 +847,7 @@ var neayiinteractions_controller = (function () {
 
 		disableButton: function (buttons) {
 			buttons.html(`<div class="spinner-border spinner-border-sm" role="status">
-							<span class="sr-only">Loading...</span>
+							<span class="sr-only">` + mw.msg('neayiinteractions-loading') + `</span>
 						 </div>`);
 			buttons.prop("disabled", true);
 		},
@@ -1061,14 +1004,14 @@ var neayiinteractions_controller = (function () {
 					imageURL = imageURL + '/60';
 
 				return $( `<div class="caracteristique-exploitation"><p>
-											<a href="/wiki/` + page + `" title="` + page + `"><img alt="` + page + `" src="` + imageURL + `" width="60" height="60"></a>
-											<span><a href="/wiki/` + page + `" title="` + page + `">` + caption + `</a></span>
-										</p></div>`);
+							<a href="/wiki/` + page + `" title="` + page + `"><img alt="` + page + `" src="` + imageURL + `" width="60" height="60"></a>
+							<span><a href="/wiki/` + page + `" title="` + page + `">` + caption + `</a></span>
+						   </p></div>`);
 			}
 			else
 				return $( `<div class="caracteristique-exploitation"><p>
-										<span><a href="/wiki/` + page + `" title="` + page + `">` + caption + `</a></span>
-									</p></div>`);
+							<span><a href="/wiki/` + page + `" title="` + page + `">` + caption + `</a></span>
+						   </p></div>`);
 		},
 
 		setupDepartmentsStats: function(deptStats) {
@@ -1111,10 +1054,11 @@ var neayiinteractions_controller = (function () {
 			$( divId + ' .stats-icons' ).html('');
 
 			characteristicsStats.slice(0, 5).forEach(function (e, i) {
+				var iconURL = insightsURL + 'api/icon/' . e.uuid + '/90';
 				$( divId + ' .stats-icons' )
 					.append( $(`<div class="caracteristique-exploitation">
 									<div>
-										<div><a href="#" data-guid="${e.uuid}" data-type="${e.type}" title="${e.page_label}"><img alt="${e.page_label}" src="${insightsURL}api/icon/${e.uuid}/90"></a></div>
+										<div><a href="#" data-guid="${e.uuid}" data-type="${e.type}" title="${e.page_label}"><img alt="${e.page_label}" src="${iconURL}"></a></div>
 										<div class="label"><a href="#" data-guid="${e.uuid}" data-type="${e.type}" title="${e.page_label}">${e.pretty_page_label}</a></div>
 									</div>
 									<div class="caracteristique-stat">x ${e.count}</div>
@@ -1255,8 +1199,8 @@ var neayiinteractions_controller = (function () {
 							div.transition()
 								.duration(200)
 								.style('opacity', 1);
-							div.html('<b>Département : </b>' + e.departmentData.pretty_page_label + '<br>'
-								+ '<b>Communauté : </b>' + e.count + '<br>')
+							div.html(mw.msg('neayiinteractions-map-departement', e.departmentData.pretty_page_label) + '<br>'
+								   + mw.msg('neayiinteractions-map-community-size', e.count) + '<br>')
 								.style('left', (d3.event.pageX + 30) + 'px')
 								.style('top', (d3.event.pageY - 30) + 'px');
 						})
@@ -1279,8 +1223,8 @@ var neayiinteractions_controller = (function () {
 							div.transition()
 								.duration(200)
 								.style('opacity', 1);
-							div.html('<b>Département : </b>' + e.departmentData.pretty_page_label + '<br>'
-								+ '<b>Communauté : </b>' + e.count + '<br>')
+							div.html(mw.msg('neayiinteractions-map-departement', e.departmentData.pretty_page_label ) + '<br>'
+								   + mw.msg('neayiinteractions-map-community-size', e.count) + '<br>')
 								.style('left', (d3.event.pageX + 30) + 'px')
 								.style('top', (d3.event.pageY - 30) + 'px');
 						})
@@ -1342,8 +1286,8 @@ var neayiinteractions_controller = (function () {
 						div.transition()
 							.duration(200)
 							.style('opacity', 1);
-						div.html('<b>Département : </b>' + e.departmentData.pretty_page_label + '<br>'
-							+ '<b>Communauté : </b>' + e.count + '<br>')
+						div.html(mw.msg('neayiinteractions-map-departement', e.departmentData.pretty_page_label ) + '<br>'
+							   + mw.msg('neayiinteractions-map-community-size', e.count) + '<br>')
 							.style('left', (d3.event.pageX + 30) + 'px')
 							.style('top', (d3.event.pageY - 30) + 'px');
 					})
@@ -1366,8 +1310,8 @@ var neayiinteractions_controller = (function () {
 						div.transition()
 							.duration(200)
 							.style('opacity', 1);
-						div.html('<b>Département : </b>' + e.departmentData.pretty_page_label + '<br>'
-							+ '<b>Communauté : </b>' + e.count + '<br>')
+						div.html(mw.msg('neayiinteractions-map-departement', e.departmentData.pretty_page_label ) + '<br>'
+							   + mw.msg('neayiinteractions-map-community-size', e.count) + '<br>')
 							.style('left', (d3.event.pageX + 30) + 'px')
 							.style('top', (d3.event.pageY - 30) + 'px');
 					})

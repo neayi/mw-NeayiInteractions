@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2016 The MITRE Corporation
+ * Copyright (c) 2023 Neayi SAS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -23,8 +23,6 @@
 
 namespace MediaWiki\Extension\NeayiInteractions;
 
-use ExtensionRegistry;
-use MWNamespace;
 use MediaWiki\MediaWikiServices;
 use HitCounters;
 

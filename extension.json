@@ -36,7 +36,24 @@
 				"mobile"
 			],
 			"messages": [
-				"NeayiInteractions-buttontext-Neayi-permalink"
+				"neayiinteractions-footer-text",
+				"neayiinteractions-see-more",
+				"neayiinteractions-interested-count",
+				"neayiinteractions-followed",
+				"neayiinteractions-follow",
+				"neayiinteractions-n-doers",
+				"neayiinteractions-nk-doers",
+				"neayiinteractions-done-it-confirmed",
+				"neayiinteractions-I-do-it",
+				"neayiinteractions-I-do-it-production",
+				"neayiinteractions-have-some-confirmed",
+				"neayiinteractions-I-have-some",
+				"neayiinteractions-have-it-confirmed",
+				"neayiinteractions-I-have-it",
+				"neayiinteractions-loading",
+
+				"neayiinteractions-map-departement",
+				"neayiinteractions-map-community-size"
 			]
 		},
 		"ext.d3.core": {
