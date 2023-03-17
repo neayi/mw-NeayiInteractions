@@ -286,6 +286,9 @@ var neayiinteractions_controller = (function () {
 				if (self.share_buttons_animation == 'on')
 					return;
 
+				if ($('.social-sticky').length == 0)
+					return;
+
 				var threshold = Math.min($('.social-sticky').next().position().top - $(window).height(), 500);
 
 				if($(window).scrollTop() > threshold)
