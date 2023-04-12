@@ -88,7 +88,7 @@ var neayiinteractions_controller = (function () {
 
 		setupDivs: function () {
 			var self = this;
-			var pageTitle = mw.config.get('wgTitle');
+			var pageTitle = mw.config.get('wgTitle') + ' ';
 			var relevantPageName = mw.config.get('wgRelevantPageName');
 			var views = mw.config.get('NeayiInteractions').wgPageViews;
 
