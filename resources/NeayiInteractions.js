@@ -436,6 +436,7 @@ var neayiinteractions_controller = (function () {
 				method: "GET"
 			}).done(function (data) {
 				self.addCommunityPage(data.data, bReset);
+				self.addAvatarChain(data.data, bReset);
 
 				if (data.current_page != data.last_page)
 				{
@@ -767,6 +768,11 @@ var neayiinteractions_controller = (function () {
 			else
 				$( '.neayi-interaction-suivre-label' ).text(mw.msg('neayiinteractions-interested-count', followers));
 
+			if (followers < 2)
+				$( '.label-community-count' ).text("");
+			else
+				$( '.label-community-count' ).text(mw.msg('neayiinteractions-community-count', followers));
+
 			if (this.hasFollowed())
 				$( '.neayi-interaction-suivre' ).html(`<span style="vertical-align: middle;">` + mw.msg('neayiinteractions-followed') + `</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`).prop("disabled", false);
 			else
@@ -916,6 +922,37 @@ var neayiinteractions_controller = (function () {
 
 		addOptionToSelect: function (selectId, label, value) {
 			$('#'+selectId).append($( '<option>' ).attr("value", value).text(label));
+		},
+
+		/**
+		 * Parses the result of the ajax call and display a list of avatars under the buttons
+		 * @param {*} data
+		 */
+		addAvatarChain: function (data, bReset) {
+
+			var self = this;
+
+			if (bReset)
+				$('.avatars').html('');
+
+			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
+
+			data.slice(0, 6).forEach(user => {
+
+				var context = user['context'];
+
+				if (context['structure'] == 'Triple Performance')
+					return;
+
+				insightsURL = "https://insights.tripleperformance.fr/";
+
+				var avatarURL = insightsURL + 'api/user/avatar/' + context['user_uuid'] + '/100';
+				var avatarDiv = `<span class="avatar"><img src="${avatarURL}"></span>`;
+
+				$( '.avatars' ).append(avatarDiv);
+			});
+
+			//			$( '#communityModal' ).modal('handleUpdate');
 		},
 
 		/**

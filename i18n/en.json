@@ -9,6 +9,7 @@
 	"neayiinteractions-footer-text": "If you liked this article, don't forget to applaud it by clicking below.<br>To stay informed of the developments that will be made to it, click on \"Follow\".<br>if you want to share your experience with the community around this topic, click \"I do it\".",
 	"neayiinteractions-see-more": "See more",
 	"neayiinteractions-interested-count": "{{PLURAL:$1|One interested|$1 interested}}",
+	"neayiinteractions-community-count": "{{PLURAL:$1|One person in the discussion|$1 people in the discussion}}",
 	"neayiinteractions-followed": "Followed",
 	"neayiinteractions-follow": "Follow",
 	"neayiinteractions-n-doers": "{{PLURAL:$1|$1 farm|$1 farms}}",
