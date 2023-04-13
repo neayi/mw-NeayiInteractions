@@ -936,17 +936,29 @@ var neayiinteractions_controller = (function () {
 				$('.avatars').html('');
 
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
+			// "default_avatar": false
 
-			data.slice(0, 6).forEach(user => {
+			var usersToShow = new Array();
+			data.forEach(user => {
 
-				var context = user['context'];
-
-				if (context['structure'] == 'Triple Performance')
+				// Ignore ourselves
+				if (user['context']['structure'] == 'Triple Performance')
 					return;
+
+				// If the avatar is not the default, we add the element at the top of the array
+				if (!user['user']['default_avatar'])
+					usersToShow.push(user);
+				else
+					usersToShow.unshift(user);
+			});
+
+			usersToShow.slice(-5).forEach(user => {
+
+				var userdetails = user['user'];
 
 				insightsURL = "https://insights.tripleperformance.fr/";
 
-				var avatarURL = insightsURL + 'api/user/avatar/' + context['user_uuid'] + '/100';
+				var avatarURL = insightsURL + 'api/user/avatar/' + userdetails['user_uid'] + '/100';
 				var avatarDiv = `<span class="avatar"><img src="${avatarURL}"></span>`;
 
 				$( '.avatars' ).append(avatarDiv);
