@@ -391,6 +391,17 @@ var neayiinteractions_controller = (function () {
 
 			var self = this;
 
+			var pageId = mw.config.get('wgArticleId');
+			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
+
+			$.ajax({
+				url: insightsURL + "api/page/" + pageId + "/followers?type=follow",
+				dataType: 'json',
+				method: "GET"
+			}).done(function (data) {
+				self.addAvatarChain(data.data);
+			});
+
 			// Check if connected:
 			if (mw.user.isAnon())
 			{
@@ -398,9 +409,6 @@ var neayiinteractions_controller = (function () {
 				$( '.community-connected' ).hide();
 				return;
 			}
-
-			var pageId = mw.config.get('wgArticleId');
-			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
 
 			// https://insights.dev.tripleperformance.fr/api/page/4282/followers?type=do
 			// Parameters: type: do | follow, cp, farming_id, cropping_id
@@ -436,7 +444,6 @@ var neayiinteractions_controller = (function () {
 				method: "GET"
 			}).done(function (data) {
 				self.addCommunityPage(data.data, bReset);
-				self.addAvatarChain(data.data, bReset);
 
 				if (data.current_page != data.last_page)
 				{
@@ -633,7 +640,7 @@ var neayiinteractions_controller = (function () {
 					self.ajaxInsights(['unfollow']);
 
 					api.post( {
-						action: 'csunwatch',
+						action: 'diunwatch',
 						pageid: pageId,
 						token: mw.user.tokens.get( 'csrfToken' )
 					} )
@@ -641,7 +648,7 @@ var neayiinteractions_controller = (function () {
 						console.log( data );
 					} )
 					.fail( function ( data ) {
-						console.log( "Failed to csunwatch" );
+						console.log( "Failed to diunwatch" );
 						console.log( data );
 					} );
 				}
@@ -649,7 +656,7 @@ var neayiinteractions_controller = (function () {
 					self.ajaxInsights(['follow']);
 
 					api.post( {
-						action: 'cswatch',
+						action: 'diwatch',
 						pageid: pageId,
 						token: mw.user.tokens.get( 'csrfToken' )
 					} )
@@ -657,7 +664,7 @@ var neayiinteractions_controller = (function () {
 						console.log( data );
 					} )
 					.fail( function ( data ) {
-						console.log( "Failed to cswatch" );
+						console.log( "Failed to diwatch" );
 						console.log( data );
 					} );
 				}
@@ -769,9 +776,9 @@ var neayiinteractions_controller = (function () {
 				$( '.neayi-interaction-suivre-label' ).text(mw.msg('neayiinteractions-interested-count', followers));
 
 			if (followers < 2)
-				$( '.label-community-count' ).text("");
+				$( '.rightSide .label-community-count' ).text("");
 			else
-				$( '.label-community-count' ).text(mw.msg('neayiinteractions-community-count', followers));
+				$( '.rightSide .label-community-count' ).text(mw.msg('neayiinteractions-community-count', followers));
 
 			if (this.hasFollowed())
 				$( '.neayi-interaction-suivre' ).html(`<span style="vertical-align: middle;">` + mw.msg('neayiinteractions-followed') + `</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`).prop("disabled", false);
@@ -928,12 +935,11 @@ var neayiinteractions_controller = (function () {
 		 * Parses the result of the ajax call and display a list of avatars under the buttons
 		 * @param {*} data
 		 */
-		addAvatarChain: function (data, bReset) {
+		addAvatarChain: function (data) {
 
 			var self = this;
 
-			if (bReset)
-				$('.avatars').html('');
+			$('.rightSide .avatars').html('');
 
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
 			// "default_avatar": false
@@ -956,15 +962,11 @@ var neayiinteractions_controller = (function () {
 
 				var userdetails = user['user'];
 
-				insightsURL = "https://insights.tripleperformance.fr/";
-
 				var avatarURL = insightsURL + 'api/user/avatar/' + userdetails['user_uid'] + '/100';
 				var avatarDiv = `<span class="avatar"><img src="${avatarURL}"></span>`;
 
-				$( '.avatars' ).append(avatarDiv);
+				$( '.rightSide .avatars' ).append(avatarDiv);
 			});
-
-			//			$( '#communityModal' ).modal('handleUpdate');
 		},
 
 		/**
