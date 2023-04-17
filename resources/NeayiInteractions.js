@@ -101,7 +101,8 @@ var neayiinteractions_controller = (function () {
 				$('<span class="page-views"><a href="/wiki/Special:PopularPages">' + views + '<i class="far fa-eye"></i></a></span>').insertAfter($('#interaction-title'));
 
 			// Remove the second edit button that feels weird (source code edition)
-			$('#ca-edit').remove();
+			// $('#ca-edit').remove(); (breaks the visual editor!)
+
 			// Copy the page menu in the new interaction bloc on the right
 			$('#p-contentnavigation').clone(true).appendTo("#neayi-interaction-desktop-menu").removeAttr('id');
 
