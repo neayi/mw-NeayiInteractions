@@ -942,8 +942,11 @@ var neayiinteractions_controller = (function () {
 
 			$('.rightSide .avatars').html('');
 
+
+			if (data.count() < 2)
+				return;
+
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
-			// "default_avatar": false
 
 			var usersToShow = new Array();
 			data.forEach(user => {
