@@ -949,7 +949,7 @@ var neayiinteractions_controller = (function () {
 			data.forEach(user => {
 
 				// Ignore ourselves
-				if (user['context']['structure'] == 'Triple Performance')
+				if (user['context'] && user['context']['structure'] == 'Triple Performance')
 					return;
 
 				// If the avatar is not the default, we add the element at the top of the array
@@ -984,6 +984,9 @@ var neayiinteractions_controller = (function () {
 			var connectedUserGUID = mw.config.get('NeayiInteractions').wgUserGuid;
 
 			data.forEach(user => {
+
+				if (!user['context'])
+					return;
 
 				var context = user['context'];
 
