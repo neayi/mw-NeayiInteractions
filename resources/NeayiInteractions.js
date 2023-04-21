@@ -943,7 +943,7 @@ var neayiinteractions_controller = (function () {
 			$('.rightSide .avatars').html('');
 
 
-			if (data.count < 2)
+			if (data.length < 2)
 				return;
 
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
