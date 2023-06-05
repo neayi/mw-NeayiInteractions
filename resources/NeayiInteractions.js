@@ -942,7 +942,6 @@ var neayiinteractions_controller = (function () {
 
 			$('.rightSide .avatars').html('');
 
-
 			if (data.length < 2)
 				return;
 
@@ -961,6 +960,9 @@ var neayiinteractions_controller = (function () {
 				else
 					usersToShow.unshift(user);
 			});
+
+			if (usersToShow.length < 2)
+				return;
 
 			usersToShow.slice(-5).forEach(user => {
 
