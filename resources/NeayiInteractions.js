@@ -364,12 +364,15 @@ var neayiinteractions_controller = (function () {
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
 
 			var apiToken = mw.config.get('NeayiInteractions').wgUserApiToken;
+
+			var wiki_language = mw.config.get('NeayiInteractions').wgWikiLanguage;
+
 			var headers = {};
 			if (apiToken != '')
 				headers.Authorization = 'Bearer ' + apiToken;
 
 			$.ajax({
-				url: insightsURL + "api/user/page/" + pageId + "?wiki_session_id=" + sessionId,
+				url: insightsURL + "api/user/page/" + pageId + "?wiki_session_id=" + sessionId + "?wiki=" + wiki_language,
 				dataType: 'json',
 				method: "GET",
 				headers: headers
@@ -394,9 +397,10 @@ var neayiinteractions_controller = (function () {
 
 			var pageId = mw.config.get('wgArticleId');
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
+			var wiki_language = mw.config.get('NeayiInteractions').wgWikiLanguage;
 
 			$.ajax({
-				url: insightsURL + "api/page/" + pageId + "/followers?type=follow",
+				url: insightsURL + "api/page/" + pageId + "/followers?type=follow" + "?wiki=" + wiki_language,
 				dataType: 'json',
 				method: "GET"
 			}).done(function (data) {
@@ -436,7 +440,7 @@ var neayiinteractions_controller = (function () {
 				if ($('#cropping-systems-select').val())
 					cropping_id = '&cropping_id=' + $('#cropping-systems-select').val();
 
-				rootURL = insightsURL + "api/page/" + pageId + "/followers?type=" + typeOfFollowers + dept + farming_id + cropping_id;
+				rootURL = insightsURL + "api/page/" + pageId + "/followers?type=" + typeOfFollowers + dept + farming_id + cropping_id + "?wiki=" + wiki_language;
 			}
 
 			$.ajax({
@@ -448,7 +452,7 @@ var neayiinteractions_controller = (function () {
 
 				if (data.current_page != data.last_page)
 				{
-					rootURL = rootURL.replace(/&page=[0-9]+/, '') + '&page=' + (parseInt(data.current_page, 10) + 1);
+					rootURL = rootURL.replace(/&page=[0-9]+/, '') + '&page=' + (parseInt(data.current_page, 10) + 1) + "?wiki=" + wiki_language;
 					$( '#load-more-community' ).prop("disabled", false).show().attr('href', rootURL);
 				}
 				else
@@ -516,11 +520,12 @@ var neayiinteractions_controller = (function () {
 			var self = this;
 			var pageId = mw.config.get('wgArticleId');
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
+			var wiki_language = mw.config.get('NeayiInteractions').wgWikiLanguage;
 
 			// https://insights.dev.tripleperformance.fr/api/page/4282/stats
 
 			$.ajax({
-				url: insightsURL + "api/page/" + pageId + "/stats",
+				url: insightsURL + "api/page/" + pageId + "/stats" + "?wiki=" + wiki_language,
 				dataType: 'json',
 				method: "GET"
 			}).done(function (data) {
@@ -565,11 +570,13 @@ var neayiinteractions_controller = (function () {
 
 			var headers = {};
 			var apiToken = mw.config.get('NeayiInteractions').wgUserApiToken;
+			var wiki_language = mw.config.get('NeayiInteractions').wgWikiLanguage;
+
 			if (apiToken != '')
 				headers.Authorization = 'Bearer ' + apiToken;
 
 			$.ajax({
-				url: insightsURL + "api/page/" + pageId + "?wiki_session_id=" + sessionId,
+				url: insightsURL + "api/page/" + pageId + "?wiki_session_id=" + sessionId + "?wiki=" + wiki_language,
 				dataType: 'json',
 				method: "POST",
 				data: {
