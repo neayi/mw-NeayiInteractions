@@ -882,6 +882,7 @@ var neayiinteractions_controller = (function () {
 		 */
 		 setStats: function (data) {
 			var self = this;
+			var wiki_language = mw.config.get('NeayiInteractions').wgWikiLanguage;
 
 			self.clearSelect('departments-select');
 			self.clearSelect('famings-select');
@@ -924,7 +925,9 @@ var neayiinteractions_controller = (function () {
 			if ($("#rex-departement"))
 				currentDept = $("#rex-departement").data('numero');
 
-			self.setupMap(data.department, currentDept);
+			if (wiki_language == 'fr') {
+				self.setupMap(data.department, currentDept);
+			}
 			self.setupCharacteristicsStats('#famings-stats', data.characteristics.farming);
 			self.setupCharacteristicsStats('#cropping-systems-stats', data.characteristics.croppingSystem);
 
@@ -1327,80 +1330,82 @@ var neayiinteractions_controller = (function () {
 		 */
 		refreshMap: function(deptStats) {
 			var self = this;
+			var wiki_language = mw.config.get('NeayiInteractions').wgWikiLanguage;
 
-			var DIConfig = mw.config.get('DiscourseIntegration');
-			if (!DIConfig)
-				return;
-
-			// On calcule le max de la population pour adapter les couleurs
-			var quantile = d3.scaleQuantile()
-				.domain([0, d3.max(deptStats, e => +e.count)])
-				.range(d3.range(9));
-
-			d3.selectAll('#map path')
-				.attr('class', '')
-				.on('mouseover', null)
-				.on('mouseout', null)
-				.on('click', null);
-			d3.selectAll('#side-map path')
-				.attr('class', '')
-				.on('mouseover', null)
-				.on('mouseout', null)
-				.on('click', null);
-
-			deptStats.forEach(function (e, i) {
-
-				d3.select('#d' + e.department_number)
-					.attr('class', d => 'department q' + quantile(+e.count) + '-9')
-					.on('mouseover', function (d) {
-						div.transition()
-							.duration(200)
-							.style('opacity', 1);
-						div.html(mw.msg('neayiinteractions-map-departement', e.departmentData.pretty_page_label ) + '<br>'
-							   + mw.msg('neayiinteractions-map-community-size', e.count) + '<br>')
-							.style('left', (d3.event.pageX + 30) + 'px')
-							.style('top', (d3.event.pageY - 30) + 'px');
-					})
-					.on('mouseout', function (d) {
-						div.style('opacity', 0);
-						div.html('')
-							.style('left', '-500px')
-							.style('top', '-500px');
-					})
-					.on('click', function (d) {
-						$('#commununity-tab').tab('show');
-						$('#departments-select').val(e.department_number).change();
-
-						self.logEvent('statsmap_click', 'Clic sur la carte dans la popup', 'community_modal');
-					});
-
-				d3.select('#side-d' + e.department_number)
-					.attr('class', d => 'department q' + quantile(+e.count) + '-9')
-					.on('mouseover', function (d) {
-						div.transition()
-							.duration(200)
-							.style('opacity', 1);
-						div.html(mw.msg('neayiinteractions-map-departement', e.departmentData.pretty_page_label ) + '<br>'
-							   + mw.msg('neayiinteractions-map-community-size', e.count) + '<br>')
-							.style('left', (d3.event.pageX + 30) + 'px')
-							.style('top', (d3.event.pageY - 30) + 'px');
-					})
-					.on('mouseout', function (d) {
-						div.style('opacity', 0);
-						div.html('')
-							.style('left', '-500px')
-							.style('top', '-500px');
-					})
-					.on('click', function (d) {
-						$( '#communityModal' ).modal('show');
-						$( '#commununity-tab' ).tab('show');
-						$( '#departments-select' ).val(e.department_number).change();
-
-						self.logEvent('inpagemap_click', 'Clic sur la carte dans la marge', 'interaction_buttons');
-					});
-			});
+			if (wiki_language == 'fr') {
+				var DIConfig = mw.config.get('DiscourseIntegration');
+				if (!DIConfig)
+					return;
+				
+				// On calcule le max de la population pour adapter les couleurs
+				var quantile = d3.scaleQuantile()
+					.domain([0, d3.max(deptStats, e => +e.count)])
+					.range(d3.range(9));
+				
+				d3.selectAll('#map path')
+					.attr('class', '')
+					.on('mouseover', null)
+					.on('mouseout', null)
+					.on('click', null);
+				d3.selectAll('#side-map path')
+					.attr('class', '')
+					.on('mouseover', null)
+					.on('mouseout', null)
+					.on('click', null);
+				
+				deptStats.forEach(function (e, i) {
+				
+					d3.select('#d' + e.department_number)
+						.attr('class', d => 'department q' + quantile(+e.count) + '-9')
+						.on('mouseover', function (d) {
+							div.transition()
+								.duration(200)
+								.style('opacity', 1);
+							div.html(mw.msg('neayiinteractions-map-departement', e.departmentData.pretty_page_label ) + '<br>'
+								   + mw.msg('neayiinteractions-map-community-size', e.count) + '<br>')
+								.style('left', (d3.event.pageX + 30) + 'px')
+								.style('top', (d3.event.pageY - 30) + 'px');
+						})
+						.on('mouseout', function (d) {
+							div.style('opacity', 0);
+							div.html('')
+								.style('left', '-500px')
+								.style('top', '-500px');
+						})
+						.on('click', function (d) {
+							$('#commununity-tab').tab('show');
+							$('#departments-select').val(e.department_number).change();
+						
+							self.logEvent('statsmap_click', 'Clic sur la carte dans la popup', 'community_modal');
+						});
+					
+					d3.select('#side-d' + e.department_number)
+						.attr('class', d => 'department q' + quantile(+e.count) + '-9')
+						.on('mouseover', function (d) {
+							div.transition()
+								.duration(200)
+								.style('opacity', 1);
+							div.html(mw.msg('neayiinteractions-map-departement', e.departmentData.pretty_page_label ) + '<br>'
+								   + mw.msg('neayiinteractions-map-community-size', e.count) + '<br>')
+								.style('left', (d3.event.pageX + 30) + 'px')
+								.style('top', (d3.event.pageY - 30) + 'px');
+						})
+						.on('mouseout', function (d) {
+							div.style('opacity', 0);
+							div.html('')
+								.style('left', '-500px')
+								.style('top', '-500px');
+						})
+						.on('click', function (d) {
+							$( '#communityModal' ).modal('show');
+							$( '#commununity-tab' ).tab('show');
+							$( '#departments-select' ).val(e.department_number).change();
+						
+							self.logEvent('inpagemap_click', 'Clic sur la carte dans la marge', 'interaction_buttons');
+						});
+				});
+			}
 		}
-
 	};
 }());
 
