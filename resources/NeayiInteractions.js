@@ -372,7 +372,7 @@ var neayiinteractions_controller = (function () {
 				headers.Authorization = 'Bearer ' + apiToken;
 
 			$.ajax({
-				url: insightsURL + "api/user/page/" + pageId + "?wiki_session_id=" + sessionId + "?wiki=" + wiki_language,
+				url: insightsURL + "api/user/page/" + pageId + "?wiki_session_id=" + sessionId + "&wiki=" + wiki_language,
 				dataType: 'json',
 				method: "GET",
 				headers: headers
@@ -400,7 +400,7 @@ var neayiinteractions_controller = (function () {
 			var wiki_language = mw.config.get('NeayiInteractions').wgWikiLanguage;
 
 			$.ajax({
-				url: insightsURL + "api/page/" + pageId + "/followers?type=follow" + "&wiki=" + wiki_language,
+				url: insightsURL + "api/page/" + pageId + "/followers?type=follow&wiki=" + wiki_language,
 				dataType: 'json',
 				method: "GET"
 			}).done(function (data) {
@@ -525,7 +525,7 @@ var neayiinteractions_controller = (function () {
 			// https://insights.dev.tripleperformance.fr/api/page/4282/stats
 
 			$.ajax({
-				url: insightsURL + "api/page/" + pageId + "/stats" + "?wiki=" + wiki_language,
+				url: insightsURL + "api/page/" + pageId + "/stats?wiki=" + wiki_language,
 				dataType: 'json',
 				method: "GET"
 			}).done(function (data) {
@@ -1332,7 +1332,7 @@ var neayiinteractions_controller = (function () {
 			var self = this;
 			var wiki_language = mw.config.get('NeayiInteractions').wgWikiLanguage;
 
-			if (wiki_language != 'fr') 
+			if (wiki_language != 'fr')
 				return;
 
 			var DIConfig = mw.config.get('DiscourseIntegration');
@@ -1373,7 +1373,7 @@ var neayiinteractions_controller = (function () {
 					.on('click', function (d) {
 						$('#commununity-tab').tab('show');
 						$('#departments-select').val(e.department_number).change();
-					
+
 						self.logEvent('statsmap_click', 'Clic sur la carte dans la popup', 'community_modal');
 					});
 				d3.select('#side-d' + e.department_number)
@@ -1397,7 +1397,7 @@ var neayiinteractions_controller = (function () {
 						$( '#communityModal' ).modal('show');
 						$( '#commununity-tab' ).tab('show');
 						$( '#departments-select' ).val(e.department_number).change();
-					
+
 						self.logEvent('inpagemap_click', 'Clic sur la carte dans la marge', 'interaction_buttons');
 					});
 			});
