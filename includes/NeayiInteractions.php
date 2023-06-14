@@ -131,6 +131,7 @@ class NeayiInteractions {
 		$store = MediaWikiServices::getInstance()->getWatchedItemStore();
 		$neayiInteractionsParams[ 'wgInitialFollowedCount' ] = $store->countWatchers( $title );
 		$neayiInteractionsParams[ 'wgInsightsRootURL' ] = $GLOBALS['wgInsightsRootURL'];
+		$neayiInteractionsParams[ 'wgWikiLanguage'] = $GLOBALS['wiki_language'];
 
 		$user = $output->getUser();
 		if ($user->isAnon())

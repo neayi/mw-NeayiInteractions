@@ -364,12 +364,15 @@ var neayiinteractions_controller = (function () {
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
 
 			var apiToken = mw.config.get('NeayiInteractions').wgUserApiToken;
+
+			var wiki_language = mw.config.get('NeayiInteractions').wgWikiLanguage;
+
 			var headers = {};
 			if (apiToken != '')
 				headers.Authorization = 'Bearer ' + apiToken;
 
 			$.ajax({
-				url: insightsURL + "api/user/page/" + pageId + "?wiki_session_id=" + sessionId,
+				url: insightsURL + "api/user/page/" + pageId + "?wiki_session_id=" + sessionId + "?wiki=" + wiki_language,
 				dataType: 'json',
 				method: "GET",
 				headers: headers
@@ -394,9 +397,10 @@ var neayiinteractions_controller = (function () {
 
 			var pageId = mw.config.get('wgArticleId');
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
+			var wiki_language = mw.config.get('NeayiInteractions').wgWikiLanguage;
 
 			$.ajax({
-				url: insightsURL + "api/page/" + pageId + "/followers?type=follow",
+				url: insightsURL + "api/page/" + pageId + "/followers?type=follow" + "&wiki=" + wiki_language,
 				dataType: 'json',
 				method: "GET"
 			}).done(function (data) {
@@ -436,7 +440,7 @@ var neayiinteractions_controller = (function () {
 				if ($('#cropping-systems-select').val())
 					cropping_id = '&cropping_id=' + $('#cropping-systems-select').val();
 
-				rootURL = insightsURL + "api/page/" + pageId + "/followers?type=" + typeOfFollowers + dept + farming_id + cropping_id;
+				rootURL = insightsURL + "api/page/" + pageId + "/followers?type=" + typeOfFollowers + dept + farming_id + cropping_id + "&wiki=" + wiki_language;
 			}
 
 			$.ajax({
@@ -516,11 +520,12 @@ var neayiinteractions_controller = (function () {
 			var self = this;
 			var pageId = mw.config.get('wgArticleId');
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
+			var wiki_language = mw.config.get('NeayiInteractions').wgWikiLanguage;
 
 			// https://insights.dev.tripleperformance.fr/api/page/4282/stats
 
 			$.ajax({
-				url: insightsURL + "api/page/" + pageId + "/stats",
+				url: insightsURL + "api/page/" + pageId + "/stats" + "?wiki=" + wiki_language,
 				dataType: 'json',
 				method: "GET"
 			}).done(function (data) {
@@ -565,11 +570,13 @@ var neayiinteractions_controller = (function () {
 
 			var headers = {};
 			var apiToken = mw.config.get('NeayiInteractions').wgUserApiToken;
+			var wiki_language = mw.config.get('NeayiInteractions').wgWikiLanguage;
+
 			if (apiToken != '')
 				headers.Authorization = 'Bearer ' + apiToken;
 
 			$.ajax({
-				url: insightsURL + "api/page/" + pageId + "?wiki_session_id=" + sessionId,
+				url: insightsURL + "api/page/" + pageId + "?wiki_session_id=" + sessionId + "&wiki=" + wiki_language,
 				dataType: 'json',
 				method: "POST",
 				data: {
@@ -875,6 +882,7 @@ var neayiinteractions_controller = (function () {
 		 */
 		 setStats: function (data) {
 			var self = this;
+			var wiki_language = mw.config.get('NeayiInteractions').wgWikiLanguage;
 
 			self.clearSelect('departments-select');
 			self.clearSelect('famings-select');
@@ -917,7 +925,9 @@ var neayiinteractions_controller = (function () {
 			if ($("#rex-departement"))
 				currentDept = $("#rex-departement").data('numero');
 
-			self.setupMap(data.department, currentDept);
+			if (wiki_language == 'fr') {
+				self.setupMap(data.department, currentDept);
+			}
 			self.setupCharacteristicsStats('#famings-stats', data.characteristics.farming);
 			self.setupCharacteristicsStats('#cropping-systems-stats', data.characteristics.croppingSystem);
 
@@ -1320,16 +1330,18 @@ var neayiinteractions_controller = (function () {
 		 */
 		refreshMap: function(deptStats) {
 			var self = this;
+			var wiki_language = mw.config.get('NeayiInteractions').wgWikiLanguage;
+
+			if (wiki_language != 'fr') 
+				return;
 
 			var DIConfig = mw.config.get('DiscourseIntegration');
 			if (!DIConfig)
 				return;
-
 			// On calcule le max de la population pour adapter les couleurs
 			var quantile = d3.scaleQuantile()
 				.domain([0, d3.max(deptStats, e => +e.count)])
 				.range(d3.range(9));
-
 			d3.selectAll('#map path')
 				.attr('class', '')
 				.on('mouseover', null)
@@ -1340,9 +1352,7 @@ var neayiinteractions_controller = (function () {
 				.on('mouseover', null)
 				.on('mouseout', null)
 				.on('click', null);
-
 			deptStats.forEach(function (e, i) {
-
 				d3.select('#d' + e.department_number)
 					.attr('class', d => 'department q' + quantile(+e.count) + '-9')
 					.on('mouseover', function (d) {
@@ -1363,10 +1373,9 @@ var neayiinteractions_controller = (function () {
 					.on('click', function (d) {
 						$('#commununity-tab').tab('show');
 						$('#departments-select').val(e.department_number).change();
-
+					
 						self.logEvent('statsmap_click', 'Clic sur la carte dans la popup', 'community_modal');
 					});
-
 				d3.select('#side-d' + e.department_number)
 					.attr('class', d => 'department q' + quantile(+e.count) + '-9')
 					.on('mouseover', function (d) {
@@ -1388,12 +1397,11 @@ var neayiinteractions_controller = (function () {
 						$( '#communityModal' ).modal('show');
 						$( '#commununity-tab' ).tab('show');
 						$( '#departments-select' ).val(e.department_number).change();
-
+					
 						self.logEvent('inpagemap_click', 'Clic sur la carte dans la marge', 'interaction_buttons');
 					});
 			});
 		}
-
 	};
 }());
 
