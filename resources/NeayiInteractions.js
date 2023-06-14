@@ -452,7 +452,7 @@ var neayiinteractions_controller = (function () {
 
 				if (data.current_page != data.last_page)
 				{
-					rootURL = rootURL.replace(/&page=[0-9]+/, '') + '&page=' + (parseInt(data.current_page, 10) + 1) + "?wiki=" + wiki_language;
+					rootURL = rootURL.replace(/&page=[0-9]+/, '') + '&page=' + (parseInt(data.current_page, 10) + 1);
 					$( '#load-more-community' ).prop("disabled", false).show().attr('href', rootURL);
 				}
 				else
@@ -1334,16 +1334,14 @@ var neayiinteractions_controller = (function () {
 
 			if (wiki_language != 'fr') 
 				return;
-				
+
 			var DIConfig = mw.config.get('DiscourseIntegration');
 			if (!DIConfig)
 				return;
-			
 			// On calcule le max de la population pour adapter les couleurs
 			var quantile = d3.scaleQuantile()
 				.domain([0, d3.max(deptStats, e => +e.count)])
 				.range(d3.range(9));
-			
 			d3.selectAll('#map path')
 				.attr('class', '')
 				.on('mouseover', null)
@@ -1354,9 +1352,7 @@ var neayiinteractions_controller = (function () {
 				.on('mouseover', null)
 				.on('mouseout', null)
 				.on('click', null);
-			
 			deptStats.forEach(function (e, i) {
-			
 				d3.select('#d' + e.department_number)
 					.attr('class', d => 'department q' + quantile(+e.count) + '-9')
 					.on('mouseover', function (d) {
@@ -1380,7 +1376,6 @@ var neayiinteractions_controller = (function () {
 					
 						self.logEvent('statsmap_click', 'Clic sur la carte dans la popup', 'community_modal');
 					});
-				
 				d3.select('#side-d' + e.department_number)
 					.attr('class', d => 'department q' + quantile(+e.count) + '-9')
 					.on('mouseover', function (d) {
