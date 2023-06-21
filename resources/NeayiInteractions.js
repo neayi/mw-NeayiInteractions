@@ -100,6 +100,9 @@ var neayiinteractions_controller = (function () {
 			if (views > 50)
 				$('<span class="page-views"><a href="/wiki/Special:PopularPages">' + views + '<i class="far fa-eye"></i></a></span>').insertAfter($('#interaction-title'));
 
+			// Move the language dropdown somewhere visible
+			$('.p-lang-dropdown').appendTo("#firstHeading");
+
 			// Remove the second edit button that feels weird (source code edition)
 			// $('#ca-edit').remove(); (breaks the visual editor!)
 
