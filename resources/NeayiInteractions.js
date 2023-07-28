@@ -81,8 +81,15 @@ var neayiinteractions_controller = (function () {
 			$('#firstHeading').hide();
 			$('.hero-portail .hero-portail-img img').attr('src', imageSrc);
 
+			// Copy the text of the first heading
 			$('.hero-portail h1').text($('h1#firstHeading').text());
-			$('.hero-portail h2').text($('span.portal-subtitle').text());
+
+			// Move the subtitles and images
+			$('span.portal-subtitle').detach().appendTo('.hero-portail h2');
+			$('img.portrait-agris').detach().appendTo('.hero-titles');
+			$('img.portrait-logo').detach().appendTo('.hero-titles');
+			$('span.hero-tags').detach().appendTo('.hero-titles');
+
 			$('.hero-portail').show();
 		},
 
