@@ -86,9 +86,20 @@ var neayiinteractions_controller = (function () {
 
 			// Move the subtitles and images
 			$('span.portal-subtitle').detach().appendTo('.hero-portail h2');
-			$('img.portrait-agris').detach().appendTo('.hero-titles');
-			$('img.portrait-logo').detach().appendTo('.hero-titles');
+			$('#content img.portrait-agris').detach().appendTo('.hero-titles');
+
+			$('#content img.portrait-logo').parent('a').each(function() {
+				$(this).detach().appendTo('.hero-titles');
+			});
+
+			$('#content img.portrait-logo').detach().appendTo('.hero-titles');
 			$('span.hero-tags').detach().appendTo('.hero-titles');
+
+			if ($('span.portrait-de-ferme').length > 0)
+			{
+				// Portrait de ferme, on supprime le bouton "Je le fais" !
+				$( '.neayi-interaction-doneit' ).parent().hide();
+			}
 
 			$('.hero-portail').show();
 		},
