@@ -318,7 +318,8 @@ var neayiinteractions_controller = (function () {
 					self.share_buttons_animation = 'on';
 					$('.social-sticky').animate({
 							opacity: 1,
-							height: 'show'
+							height: 'show',
+							display: 'block'
 						},
 						{
 							complete: function(){
@@ -331,7 +332,8 @@ var neayiinteractions_controller = (function () {
 					self.share_buttons_animation = 'on';
 					$('.social-sticky').animate({
 							opacity: 0,
-							height: 'hide'
+							height: 'hide',
+							display: 'none'
 						},
 						{
 							complete: function(){
