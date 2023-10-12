@@ -83,7 +83,11 @@ var neayiinteractions_controller = (function () {
 
 			// Copy the text of the first heading
 			$('.hero-portail h1').text($('h1#firstHeading').text());
-			$('div.p-lang-dropdown').detach().appendTo('.hero-portail h1');
+
+			// Move the language dropdown. For some reason it won't move if we are too quick...
+			setTimeout(() => {
+				$('div.p-lang-dropdown').detach().appendTo('.hero-portail h1');
+			}, 1000);
 
 			// Move the subtitles and images
 			$('span.portal-subtitle').detach().appendTo('.hero-portail h2');
