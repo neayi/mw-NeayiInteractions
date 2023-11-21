@@ -20,6 +20,9 @@
 			"i18n"
 		]
 	},
+	"ExtensionMessagesFiles": {
+		"NeayiInteractionsMagic": "NeayiInteractionsMagic.i18n.magic.php"
+	},
 	"ResourceModules": {
 		"ext.NeayiInteractions": {
 			"scripts": [
