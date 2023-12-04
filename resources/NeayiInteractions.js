@@ -220,7 +220,7 @@ var neayiinteractions_controller = (function () {
 				});
 			}
 
-			if (typeof _paq === 'function')
+			if (typeof _paq === 'object')
 			{
 				_paq.push(['trackEvent', category, name]);
 			}
