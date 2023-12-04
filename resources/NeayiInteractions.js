@@ -220,6 +220,11 @@ var neayiinteractions_controller = (function () {
 				});
 			}
 
+			if (typeof _paq === 'function')
+			{
+				_paq.push(['trackEvent', category, name]);
+			}
+
 			if (typeof fbq === 'function')
 			{
 				fbq('trackCustom', name);
