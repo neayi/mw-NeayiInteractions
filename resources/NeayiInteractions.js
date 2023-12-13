@@ -42,8 +42,6 @@ var neayiinteractions_controller = (function () {
 				this.targetComment = hash;
 			}
 
-			mw.config.set('mwInternalFollowStatus', mw.config.get('NeayiInteractions').wgInitialFollowedStatus);
-
 			this.setPortal();
 
 			this.setupShareLinks();
@@ -825,32 +823,6 @@ var neayiinteractions_controller = (function () {
 				$( '.neayi-interaction-suivre' ).html(`<span style="vertical-align: middle;">` + mw.msg('neayiinteractions-followed') + `</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`).prop("disabled", false);
 			else
 				$( '.neayi-interaction-suivre' ).text(mw.msg('neayiinteractions-follow')).prop("disabled", false);
-
-			// Align the internal mediawiki status with the follow status:
-			var currentInternalFollowStatus = mw.config.get('mwInternalFollowStatus');
-			if (currentInternalFollowStatus != this.hasFollowed())
-			{
-				var mwTitle = mw.config.get('wgRelevantPageName');
-
-				if (this.hasFollowed())
-				{
-					new mw.Api().watch(mwTitle)
-						.done(function () {
-							mw.config.set('mwInternalFollowStatus', true);
-						})
-						.fail(function () {
-						});
-				}
-				else
-				{
-					new mw.Api().unwatch(mwTitle)
-						.done(function () {
-							mw.config.set('mwInternalFollowStatus', false);
-						})
-						.fail(function () {
-						});
-				}
-			}
 		},
 
 		setDoneItLabels: function () {

@@ -123,7 +123,6 @@ class NeayiInteractions {
 		$neayiInteractionsParams[ 'wgUserApiToken' ] = '';
 		$user = $output->getUser();
 		if ( !$user->isAnon() ) {
-			$neayiInteractionsParams[ 'wgInitialFollowedStatus' ] = $user->isWatched( $title );
 			$neayiInteractionsParams[ 'wgUserApiToken' ] = self::getNeayiApiToken( $user );
 		}
 		$neayiInteractionsParams[ 'wgUserSessionId' ] = $_COOKIE[$GLOBALS['wgDBname'] . 'mwuser-sessionId'];
