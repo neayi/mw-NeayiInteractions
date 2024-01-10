@@ -125,7 +125,11 @@ class NeayiInteractions {
 		if ( !$user->isAnon() ) {
 			$neayiInteractionsParams[ 'wgUserApiToken' ] = self::getNeayiApiToken( $user );
 		}
-		$neayiInteractionsParams[ 'wgUserSessionId' ] = $_COOKIE[$GLOBALS['wgDBname'] . 'mwuser-sessionId'];
+
+		if (isset($_COOKIE[$GLOBALS['wgDBname'] . 'mwuser-sessionId']))
+			$neayiInteractionsParams[ 'wgUserSessionId' ] = $_COOKIE[$GLOBALS['wgDBname'] . 'mwuser-sessionId'];
+		else
+			$neayiInteractionsParams[ 'wgUserSessionId' ] = '';
 
 		$store = MediaWikiServices::getInstance()->getWatchedItemStore();
 		$neayiInteractionsParams[ 'wgInitialFollowedCount' ] = $store->countWatchers( $title );
