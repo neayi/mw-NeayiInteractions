@@ -145,7 +145,7 @@ class NeayiInteractions {
 		$neayiInteractionsParams['wgPageViews'] = HitCounters\HitCounters::getCount( $title );
 
 		$output->addJsConfigVars( 'NeayiInteractions', $neayiInteractionsParams );
-		$output->addModules( 'ext.NeayiInteractions' );
+		$output->addModules( ['ext.NeayiInteractions'] );
 	}
 
 	/**
