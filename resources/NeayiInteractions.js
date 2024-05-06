@@ -142,8 +142,8 @@ var neayiinteractions_controller = (function () {
 			$('a.login-links').attr('href', '/index.php?title=Special:Login&returnto=' + relevantPageName);
 
 			// Check if comments are enabled on the page. If not, we disable all interactions.
-			var DIConfig = mw.config.get('DiscourseIntegration');
-			if (!DIConfig) {
+			if ($('#di-disable-comments').length > 0)
+			{
 				$('.comments-link').text('').prop('disabled', true);
 				$('.interaction-buttons').hide();
 				$('.interaction-links').hide();
