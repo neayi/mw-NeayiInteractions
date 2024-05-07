@@ -141,10 +141,12 @@ var neayiinteractions_controller = (function () {
 			// Fix the login/create account links
 			$('a.login-links').attr('href', '/index.php?title=Special:Login&returnto=' + relevantPageName);
 
-			// Check if there's a search engine on the page. If yes, remove the right column
+			// Check if there's a search engine on the page. If yes, remove the right and left columns
 			if ($('#app').length > 0)
 			{
 				$( '.rightSide' ).remove();
+				$( '.leftSide' ).remove();
+				$( '.centralDiv' ).addClass("col-lg-10 mx-auto");
 			}
 
 			// Check if comments are enabled on the page. If not, we disable all interactions.
