@@ -44,16 +44,20 @@ var neayiinteractions_controller = (function () {
 
 			this.setPortal();
 
-			this.setupShareLinks();
+			if (this.isInIframe()) {
+				this.setupPageAsIframe();
+			} else {
+				this.setupShareLinks();
 
-			this.setupDivs();
+				this.setupDivs();
 
-			this.getInitialCounts();
+				this.getInitialCounts();
 
-			this.loadStats();
-			this.loadCommunity('');
+				this.loadStats();
+				this.loadCommunity('');
 
-			this.hideOverflownCards();
+				this.hideOverflownCards();
+			}
 
 			console.log("Neayi interactions setup done");
 		},
@@ -387,6 +391,26 @@ var neayiinteractions_controller = (function () {
 			// If there's an interaction bloc inside the page, add the buttons now
 			if ($('.interaction-bloc-inside').length > 0)
 				$('.interaction-bloc .interaction-buttons .row').clone(true).appendTo(".interaction-bloc-inside .interaction-top .interaction-buttons");
+		},
+
+		isInIframe: function() {
+			return ($('#page_is_iframe').length > 0);
+		},
+
+		setupPageAsIframe: function() {
+			// Hide right and left col
+			$( '.rightSide' ).remove();
+			$( '.leftSide' ).remove();
+			$( '.centralDiv' ).addClass("col-lg-10 mx-auto");
+
+			$( '#neayi-searchform').parent().remove();
+
+			// Remove menus and footers
+			$('#mw-navigation').hide();
+			$('.footer ').hide();
+
+			// Set all links as target _blank
+			$('head').append('<base target="_blank" />');
 		},
 
 		/**
