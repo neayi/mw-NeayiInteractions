@@ -403,7 +403,11 @@ var neayiinteractions_controller = (function () {
 			$( '.leftSide' ).remove();
 			$( '.centralDiv' ).addClass("col-lg-10 mx-auto");
 
+			// Hide search form
 			$( '#neayi-searchform').parent().remove();
+
+			// Hide the title
+			$('#firstHeading').hide();
 
 			// Remove menus and footers
 			$('#mw-navigation').hide();
