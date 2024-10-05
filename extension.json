@@ -61,9 +61,6 @@
 			]
 		},
 		"ext.d3.core": {
-			"styles": [
-				"colorbrewer.css"
-			],
 			"scripts": [
 				"d3.v5.min.js"
 			]
