@@ -380,7 +380,7 @@ var neayiinteractions_controller = (function () {
 
 			if ($('.interaction-bloc-inside').length == 0)
 			{
-				$('#bodyContent').append($(`<div class="interaction-bloc-inside">
+				$('#bodyContent').append($(`<div class="interaction-bloc-inside mt-2">
 						<div class="interaction-top">
 							<p>` + mw.msg('neayiinteractions-footer-text') + `</p>
 							<div class="container px-0 interaction-buttons"></div>
