@@ -22,5 +22,7 @@
     "neayiinteractions-I-have-it": "eu tenho isso",
     "neayiinteractions-loading": "Carregando...",
     "neayiinteractions-map-departement": "<b>Departamento:<\/b> $1",
-    "neayiinteractions-map-community-size": "<b>Comunidade:<\/b> $1"
+    "neayiinteractions-map-community-size": "<b>Comunidade:<\/b> $1",
+    "neayiinteractions-source-code": "Código fonte",
+    "neayiinteractions-form": "Forma"
 }

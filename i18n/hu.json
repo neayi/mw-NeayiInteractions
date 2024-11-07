@@ -22,5 +22,7 @@
     "neayiinteractions-I-have-it": "megvan",
     "neayiinteractions-loading": "Terhelés...",
     "neayiinteractions-map-departement": "<b>Osztály:<\/b> $1",
-    "neayiinteractions-map-community-size": "<b>Közösség:<\/b> $1"
+    "neayiinteractions-map-community-size": "<b>Közösség:<\/b> $1",
+    "neayiinteractions-source-code": "Forráskód",
+    "neayiinteractions-form": "Forma"
 }

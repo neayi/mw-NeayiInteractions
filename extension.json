@@ -57,7 +57,10 @@
 				"neayiinteractions-loading",
 
 				"neayiinteractions-map-departement",
-				"neayiinteractions-map-community-size"
+				"neayiinteractions-map-community-size",
+
+				"neayiinteractions-source-code",
+				"neayiinteractions-form"
 			]
 		},
 		"ext.d3.core": {
