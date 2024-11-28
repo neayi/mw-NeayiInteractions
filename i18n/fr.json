@@ -22,7 +22,5 @@
     "neayiinteractions-I-have-it": "Je l'ai",
     "neayiinteractions-loading": "Chargement...",
     "neayiinteractions-map-departement": "<b>Département :<\/b> $1",
-    "neayiinteractions-map-community-size": "<b>Communauté :<\/b> $1",
-    "neayiinteractions-source-code": "Code source",
-    "neayiinteractions-form": "Formulaire"
+    "neayiinteractions-map-community-size": "<b>Communauté :<\/b> $1"
 }

@@ -22,7 +22,5 @@
     "neayiinteractions-I-have-it": "Done it button - I have it",
     "neayiinteractions-loading": "Loading placeholder",
     "neayiinteractions-map-departement": "Label for the county in the map",
-    "neayiinteractions-map-community-size": "Label for the size of the community in the map",
-    "neayiinteractions-source-code": "Label for the source code edit link in the menu",
-    "neayiinteractions-form": "Label for the form edit link in the menu"
+    "neayiinteractions-map-community-size": "Label for the size of the community in the map"
 }

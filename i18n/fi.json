@@ -22,7 +22,5 @@
     "neayiinteractions-I-have-it": "Minulla on se",
     "neayiinteractions-loading": "Ladataan...",
     "neayiinteractions-map-departement": "<b>Osasto:<\/b> $1",
-    "neayiinteractions-map-community-size": "<b>Yhteisö:<\/b> $1",
-    "neayiinteractions-source-code": "Lähdekoodi",
-    "neayiinteractions-form": "Lomake"
+    "neayiinteractions-map-community-size": "<b>Yhteisö:<\/b> $1"
 }
