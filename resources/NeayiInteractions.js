@@ -127,10 +127,6 @@ var neayiinteractions_controller = (function () {
 
 			// Move the language dropdown somewhere visible
 			$('.p-lang-dropdown').appendTo("#firstHeading");
-
-			// Remove the second edit button that feels weird (source code edition)
-			$('#ca-formedit a').text(mw.msg('neayiinteractions-form'));
-			$('#ca-edit a').text(mw.msg('neayiinteractions-source-code'));
     
 			// Copy the page menu in the new interaction bloc on the right
 			$('#p-contentnavigation').clone(true).appendTo("#neayi-interaction-desktop-menu").removeAttr('id');
