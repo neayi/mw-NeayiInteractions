@@ -391,7 +391,7 @@ var neayiinteractions_controller = (function () {
 		},
 
 		isInIframe: function() {
-			return ($('#page_is_iframe').length > 0);
+			return mw.config.get('wgCanonicalNamespace') == 'Iframe';
 		},
 
 		setupPageAsIframe: function() {
@@ -399,6 +399,10 @@ var neayiinteractions_controller = (function () {
 			$( '.rightSide' ).remove();
 			$( '.leftSide' ).remove();
 			$( '.centralDiv' ).addClass("col-lg-10 mx-auto");
+			$( '#siteNotice' ).remove();
+
+			// Center the content column
+			$( '#content' ).addClass("mx-auto");
 
 			// Hide search form
 			$( '#neayi-searchform').parent().remove();
