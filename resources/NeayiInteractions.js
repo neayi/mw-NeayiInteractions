@@ -1092,16 +1092,16 @@ var neayiinteractions_controller = (function () {
 				{
 					var depName = context['characteristics_departement'][0].page;
 					var depIcon = context['characteristics_departement'][0].icon;
-					features.append(self.makeFeature(depName, depName, depIcon));
+					features.append(self.makeFeature(depName, depName, depIcon, 'department'));
 				}
 
 				// Add the productions
 				context['productions'].forEach(element => {
-					features.append(self.makeFeature(element['caption'], element['page'], element['icon']));
+					features.append(self.makeFeature(element['caption'], element['page'], element['icon'], 'characteristic'));
 				});
 
 				context['characteristics'].forEach(element => {
-					features.append(self.makeFeature(element['caption'], element['page'], element['icon']));
+					features.append(self.makeFeature(element['caption'], element['page'], element['icon'], 'characteristic'));
 				});
 
 				$( '#community-items' ).append(userdiv);
@@ -1110,22 +1110,20 @@ var neayiinteractions_controller = (function () {
 			$( '#communityModal' ).modal('handleUpdate');
 		},
 
-		makeFeature: function(caption, page, imageURL = '') {
+		makeFeature: function(caption, page, glyph, type) {
 
-			if (imageURL != '')
+			if (glyph.length > 0)
 			{
-				// Make sure the Icon URL ends with /60 for the right width
-				if (!imageURL.match(/\/60/))
-					imageURL = imageURL + '/60';
-
 				return $( `<div class="caracteristique-exploitation"><p>
-							<a href="/wiki/` + page + `" title="` + page + `"><img alt="` + page + `" src="` + imageURL + `" width="60" height="60"></a>
-							<span><a href="/wiki/` + page + `" title="` + page + `">` + caption + `</a></span>
+							<a href="/wiki/${page}" title="${page}" class="stretched-link">
+								<span class="tp-${glyph} glyph-${type}"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span><span class="path7"></span><span class="path8"></span><span class="path9"></span><span class="path10"></span><span class="path11"></span><span class="path12"></span><span class="path13"></span><span class="path14"></span><span class="path15"></span><span class="path16"></span><span class="path17"></span><span class="path18"></span><span class="path19"></span><span class="path20"></span><span class="path21"></span><span class="path22"></span><span class="path23"></span><span class="path24"></span><span class="path25"></span><span class="path26"></span><span class="path27"></span><span class="path28"></span><span class="path29"></span><span class="path30"></span><span class="path31"></span><span class="path32"></span></span>
+								<span class="label">${caption}</span>
+							</a>
 						   </p></div>`);
 			}
 			else
 				return $( `<div class="caracteristique-exploitation"><p>
-							<span><a href="/wiki/` + page + `" title="` + page + `">` + caption + `</a></span>
+							<a href="/wiki/${page}" title="${page}"><span class="label">${caption}</span></a>
 						   </p></div>`);
 		},
 
@@ -1169,12 +1167,14 @@ var neayiinteractions_controller = (function () {
 			$( divId + ' .stats-icons' ).html('');
 
 			characteristicsStats.slice(0, 5).forEach(function (e, i) {
-				var iconURL = insightsURL + 'api/icon/' + e.uuid + '/90';
+				let glyph = e.icon;
 				$( divId + ' .stats-icons' )
 					.append( $(`<div class="caracteristique-exploitation">
 									<div>
-										<div><a href="#" data-guid="${e.uuid}" data-type="${e.type}" title="${e.page_label}"><img alt="${e.page_label}" src="${iconURL}"></a></div>
-										<div class="label"><a href="#" data-guid="${e.uuid}" data-type="${e.type}" title="${e.page_label}">${e.pretty_page_label}</a></div>
+										<a href="#" class="stretched-link" data-guid="${e.uuid}" data-type="${e.type}" title="${e.page_label}">
+											<span class="tp-${glyph} glyph-characteristic"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span><span class="path7"></span><span class="path8"></span><span class="path9"></span><span class="path10"></span><span class="path11"></span><span class="path12"></span><span class="path13"></span><span class="path14"></span><span class="path15"></span><span class="path16"></span><span class="path17"></span><span class="path18"></span><span class="path19"></span><span class="path20"></span><span class="path21"></span><span class="path22"></span><span class="path23"></span><span class="path24"></span><span class="path25"></span><span class="path26"></span><span class="path27"></span><span class="path28"></span><span class="path29"></span><span class="path30"></span><span class="path31"></span><span class="path32"></span></span>
+											<span class="label">${e.pretty_page_label}</span>
+										</a>
 									</div>
 									<div class="caracteristique-stat">x ${e.count}</div>
 								</div>`) );
