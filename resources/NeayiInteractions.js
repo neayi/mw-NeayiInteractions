@@ -31,16 +31,13 @@ var neayiinteractions_controller = (function () {
 
 		initialize: function () {
 			this.baseUrl = window.location.href.split(/[?#]/)[0];
-			this.imagepath = mw.config.get('wgExtensionAssetsPath') +
-				'/NeayiInteractions/images/';
-			if (window.location.hash) {
-				var hash = window.location.hash.substring(1);
-				var queryIndex = hash.indexOf('?');
-				if (queryIndex !== -1) {
-					hash = hash.substring(0, queryIndex);
-				}
-				this.targetComment = hash;
-			}
+			this.imagepath = mw.config.get('wgExtensionAssetsPath') + '/NeayiInteractions/images/';
+
+			var pageId = mw.config.get('wgArticleId');
+			if (pageId == 0) {
+				$('.interaction-bloc').hide();
+				return;
+			}				
 
 			this.setPortal();
 
@@ -73,6 +70,8 @@ var neayiinteractions_controller = (function () {
 		 * Look in the page for text and image to be put in the hero
 		 */
 		setPortal: function () {
+			let self = this;
+
 			var heroImage = $('img.portail-background');
 
 			if (heroImage.length == 0)
@@ -86,11 +85,6 @@ var neayiinteractions_controller = (function () {
 			// Copy the text of the first heading
 			$('.hero-portail h1').text($('h1#firstHeading').text());
 
-			// Move the language dropdown. For some reason it won't move if we are too quick...
-			setTimeout(() => {
-				$('div.p-lang-dropdown').detach().appendTo('.hero-portail h1');
-			}, 1000);
-
 			// Move the subtitles and images
 			$('span.portal-subtitle').detach().appendTo('.hero-portail h2');
 			$('#content img.portrait-agris').detach().appendTo('.hero-titles');
@@ -102,34 +96,44 @@ var neayiinteractions_controller = (function () {
 			$('#content img.portrait-logo').detach().appendTo('.hero-titles');
 			$('span.hero-tags').detach().appendTo('.hero-titles');
 
-			if ($('span.portrait-de-ferme').length > 0)
-			{
-				// Portrait de ferme, on supprime le bouton "Je le fais" !
-				$( '.neayi-interaction-doneit' ).parent().hide();
-			}
+			// if ($('span.portrait-de-ferme').length > 0)
+			// {
+			// 	// Portrait de ferme, on supprime le bouton "Je le fais" !
+			// 	$( '.neayi-interaction-doneit' ).parent().hide();
+			// }
 
 			$('.hero-portail').show();
+
+			self.heroMode = true;
 		},
 
 		setupDivs: function () {
 			var self = this;
 			var pageTitle = mw.config.get('wgTitle') + ' ';
 			var relevantPageName = mw.config.get('wgRelevantPageName');
-			var views = mw.config.get('NeayiInteractions').wgPageViews;
 
 			this.setupSuggestionBox();
 
 			$('#interaction-title').text(pageTitle);
 			$('.title-sticky .sticky-title-span').text(pageTitle);
 
-			if (views > 50)
-				$('<span class="page-views"><a href="/wiki/Special:PopularPages">' + views + '<i class="far fa-eye"></i></a></span>').insertAfter($('#interaction-title'));
+			self.setupPageViewsCount();
+			let mainHeader = $('#firstHeading .mw-page-title-main');
+
+			if (self.heroMode)
+				mainHeader = $(".hero-portail h1");
+
+			if (!mw.user.isAnon()) {
+				// Create a drop down menu with the page actions
+				mainHeader.append(`<span class="pageMenu"><button class="menu btn btn-light" type="button" data-toggle="dropdown" data-boundary="viewport" aria-haspopup="true" aria-expanded="false">
+					<span class="material-icons align-middle" aria-hidden="true">more_vert</span>
+				</button></span>`);
+
+				$('#p-contentnavigation').clone(true).appendTo(".pageMenu").removeAttr('id');	
+			}
 
 			// Move the language dropdown somewhere visible
-			$('.p-lang-dropdown').appendTo("#firstHeading");
-    
-			// Copy the page menu in the new interaction bloc on the right
-			$('#p-contentnavigation').clone(true).appendTo("#neayi-interaction-desktop-menu").removeAttr('id');
+			mainHeader.append($('.p-lang-dropdown'));
 
 			// Move the original menu in the mobile version of the interaction bloc. Since we now have a copy of this
 			// menu, we will remove all the IDs from the children divs, in order to avoir dupplicate IDs.
@@ -172,11 +176,10 @@ var neayiinteractions_controller = (function () {
 				}
 
 				// Add events on the buttons to trigger the modals and API calls
-				this.setupFollowButton($('.neayi-interaction-suivre'));
-				this.setupApplauseButton($('.neayi-interaction-applause'));
-				this.setupDoneButton($('.neayi-interaction-doneit'));
-
-				this.setupInPageInteractionBloc();
+				this.setupFollowButton($('.neayi-interaction-suivre, .neayi-footer-button-suivre'));
+				this.setupApplauseButton($('.neayi-interaction-applause, .neayi-footer-button-applause'));
+				this.setupSeeMoreButton($('.neayi-footer-button-more'));
+				// this.setupDoneButton($('.neayi-interaction-doneit'));
 			}
 
 			$( '#load-more-community' ).on('click', function (e) {
@@ -193,7 +196,7 @@ var neayiinteractions_controller = (function () {
 				if (!scrollMoreButton.is(":visible") || scrollMoreButton.prop("disabled"))
 					return;
 
-				if (scrollMoreButton.offset().top < window.innerHeight)
+				if (self.isInViewport(scrollMoreButton))
 				{
 					// Load another page
 					$( '#load-more-community' ).prop("disabled", true);
@@ -206,10 +209,26 @@ var neayiinteractions_controller = (function () {
 				self.logEvent('statsfilter_select_click', 'Filtre dans la communauté - listes déroulantes', 'community_modal');
 			  });
 
-			$('#community-doneit-only').on('change', function() {
-				self.loadCommunity();
-				self.logEvent('statsfilter_donitonly_click', 'Filtre dans la communauté - uniquement ceux qui l\'ont fait', 'community_modal');
-			  });
+			// $('#community-doneit-only').on('change', function() {
+			// 	self.loadCommunity();
+			// 	self.logEvent('statsfilter_donitonly_click', 'Filtre dans la communauté - uniquement ceux qui l\'ont fait', 'community_modal');
+			//   });
+		},
+
+		isInViewport: function(div) {
+			var elementTop = $(div).offset().top;
+			var elementBottom = elementTop + $(div).outerHeight();
+			var viewportTop = $(window).scrollTop();
+			var viewportBottom = viewportTop + $(window).height();
+			return elementBottom > viewportTop && elementTop < viewportBottom;
+		},
+
+		setupPageViewsCount: function () {
+			var views = mw.config.get('NeayiInteractions').wgPageViews;
+			if (views > 50) {
+				$('<a class="page-views" href="/wiki/Special:PopularPages">' + views + ' <i class="far fa-eye"></i></a>').insertBefore($('#mw-toc-heading'));
+				$('<div style="clear: both"></div>').insertAfter($('#mw-toc-heading'));
+			}
 		},
 
 		/**
@@ -266,7 +285,7 @@ var neayiinteractions_controller = (function () {
 								.on('click', function (e) {
 									self.logEvent('Partage twitter', 'Partage sur twitter', 'share_buttons');
 								});
-			$('.share-whatsapp').attr('href', 'whatsapp://send?text=' + mwTitle + " " + whatsappURL)
+			$('.share-whatsapp, .neayi-footer-button-whatsapp-share').attr('href', 'whatsapp://send?text=' + mwTitle + " " + whatsappURL)
 								.on('click', function (e) {
 									self.logEvent('Partage whatsapp', 'Partage sur whatsapp', 'share_buttons');
 								});
@@ -292,6 +311,12 @@ var neayiinteractions_controller = (function () {
 
 				if($(window).scrollTop() > 250)
 				{
+					let tocLabel = $('#mw-toc-heading');
+					if (self.TOCLabel == undefined)
+						self.TOCLabel = tocLabel.text();
+
+					tocLabel.text(mw.config.get('wgTitle'));
+
 					self.title_animation = 'on';
 					$('.title-sticky').animate({
 							opacity: 1,
@@ -306,6 +331,9 @@ var neayiinteractions_controller = (function () {
 				}
 				else
 				{
+					if (self.TOCLabel != undefined)
+						$('#mw-toc-heading').text(self.TOCLabel);
+
 					self.title_animation = 'on';
 					$('.title-sticky').animate({
 							opacity: 0,
@@ -369,27 +397,6 @@ var neayiinteractions_controller = (function () {
 			});
 		},
 
-		setupInPageInteractionBloc: function() {
-
-			var wikisearch = $('#app > .wikisearch');
-			if (wikisearch.length > 0)
-				return;
-
-			if ($('.interaction-bloc-inside').length == 0)
-			{
-				$('#bodyContent').append($(`<div class="interaction-bloc-inside mt-2">
-						<div class="interaction-top">
-							<p>` + mw.msg('neayiinteractions-footer-text') + `</p>
-							<div class="container px-0 interaction-buttons"></div>
-						</div>
-					</div>`));
-			}
-
-			// If there's an interaction bloc inside the page, add the buttons now
-			if ($('.interaction-bloc-inside').length > 0)
-				$('.interaction-bloc .interaction-buttons .row').clone(true).appendTo(".interaction-bloc-inside .interaction-top .interaction-buttons");
-		},
-
 		isInIframe: function() {
 			return mw.config.get('wgCanonicalNamespace') == 'Iframe';
 		},
@@ -449,7 +456,7 @@ var neayiinteractions_controller = (function () {
 
 				self.setApplauseLabels();
 				self.setFollowersLabels();
-				self.setDoneItLabels();
+				// self.setDoneItLabels();
 			});
 		},
 
@@ -493,8 +500,8 @@ var neayiinteractions_controller = (function () {
 				bReset = true;
 
 				var typeOfFollowers = 'follow';
-				if ($('#community-doneit-only').prop('checked'))
-					typeOfFollowers = "do";
+				// if ($('#community-doneit-only').prop('checked'))
+				// 	typeOfFollowers = "do";
 
 				var dept = '';
 				if ($('#departments-select').val())
@@ -619,14 +626,14 @@ var neayiinteractions_controller = (function () {
 			return false;
 		},
 
-		hasDone: function () {
-			var interactions = mw.config.get('mwInteractions');
+		// hasDone: function () {
+		// 	var interactions = mw.config.get('mwInteractions');
 
-			if (interactions && interactions.state.done)
-				return true;
+		// 	if (interactions && interactions.state.done)
+		// 		return true;
 
-			return false;
-		},
+		// 	return false;
+		// },
 
 		ajaxInsights: function (actions, done_value = []) {
 			var self = this;
@@ -657,7 +664,7 @@ var neayiinteractions_controller = (function () {
 
 				self.setApplauseLabels();
 				self.setFollowersLabels();
-				self.setDoneItLabels();
+				// self.setDoneItLabels();
 
 				self.loadStats();
 			});
@@ -750,76 +757,103 @@ var neayiinteractions_controller = (function () {
 
 		},
 
+		setupSeeMoreButton: function(buttons) {
+			var self = this;
+
+			buttons.on('click', function (e) {
+				e.preventDefault();
+
+				self.logEvent('drawer_open', "Ouverture du tiroir bas", 'interaction_buttons');
+
+				if (self.drawerHeightSet == undefined) {
+					// Get the height of the sticky title and of the footer buttons : 
+					let titleHeight = $('.title-sticky').outerHeight(true) + $('.footer-buttons-container').outerHeight(true);
+					let maxDrawerHeight = (window.innerHeight - titleHeight)  + 'px';
+
+					$(`<style>
+						.social-sticky .footer-drawer.opened  {
+							max-height: ${maxDrawerHeight};
+						}
+						</style>`).appendTo('head');
+
+					self.drawerHeightSet = true;
+				}
+
+				$(this).toggleClass( 'opened' );
+				$('.footer-drawer').toggleClass( 'opened' );
+			});
+		},
+
 		/**
 		 * Prepare the click event that'll trigger the Done API
 		 *
 		 * @param jQuery buttons list buttons
 		 */
-		setupDoneButton: function (buttons) {
-			var self = this;
+		// setupDoneButton: function (buttons) {
+		// 	var self = this;
 
-			buttons.on('click', function (e) {
-				self.logEvent(self.hasDone() ? 'undone_it_click' : 'done_it_click', 'Clic sur "Je l\'ai fait"', 'interaction_buttons');
+		// 	buttons.on('click', function (e) {
+		// 		self.logEvent(self.hasDone() ? 'undone_it_click' : 'done_it_click', 'Clic sur "Je l\'ai fait"', 'interaction_buttons');
 
-				if (mw.user.isAnon()) {
-					$('#requiresLoginModal').modal('show')
-					return;
-				}
+		// 		if (mw.user.isAnon()) {
+		// 			$('#requiresLoginModal').modal('show')
+		// 			return;
+		// 		}
 
-				self.disableButton(buttons);
+		// 		self.disableButton(buttons);
 
-				if (self.hasDone()) {
-					mw.config.set('mwDoneItStatus', false);
-					buttons.prop("disabled", false);
+		// 		if (self.hasDone()) {
+		// 			mw.config.set('mwDoneItStatus', false);
+		// 			buttons.prop("disabled", false);
 
-					self.ajaxInsights(['undone']);
-				}
-				else {
-					mw.config.set('mwDoneItStatus', true);
-					buttons.prop("disabled", false);
+		// 			self.ajaxInsights(['undone']);
+		// 		}
+		// 		else {
+		// 			mw.config.set('mwDoneItStatus', true);
+		// 			buttons.prop("disabled", false);
 
-					$('#tellUsMoreModalSubmit').on('click', function (e) {
-						e.preventDefault();
+		// 			$('#tellUsMoreModalSubmit').on('click', function (e) {
+		// 				e.preventDefault();
 
-						var actions = ['done'];
-						if ($('#followwheck').val() == "follow")
-						{
-							// The user has clicked on the "follow the page" checkbox
-							actions = ['done', 'follow'];
+		// 				var actions = ['done'];
+		// 				if ($('#followwheck').val() == "follow")
+		// 				{
+		// 					// The user has clicked on the "follow the page" checkbox
+		// 					actions = ['done', 'follow'];
 
-							var api = new mw.Api();
-							var pageId = mw.config.get('wgArticleId');
+		// 					var api = new mw.Api();
+		// 					var pageId = mw.config.get('wgArticleId');
 
-							api.post( {
-								action: 'cswatch',
-								pageid: pageId,
-								token: mw.user.tokens.get( 'csrfToken' )
-							} )
-							.done( function ( data ) {
-								console.log( data );
-							} )
-							.fail( function ( data ) {
-								console.log( "Failed to cswatch" );
-								console.log( data );
-							} );
-						}
+		// 					api.post( {
+		// 						action: 'cswatch',
+		// 						pageid: pageId,
+		// 						token: mw.user.tokens.get( 'csrfToken' )
+		// 					} )
+		// 					.done( function ( data ) {
+		// 						console.log( data );
+		// 					} )
+		// 					.fail( function ( data ) {
+		// 						console.log( "Failed to cswatch" );
+		// 						console.log( data );
+		// 					} );
+		// 				}
 
-						var otherparams = {};
-						otherparams.start_at = $('#sinceInputId').val() + "-01-01";
+		// 				var otherparams = {};
+		// 				otherparams.start_at = $('#sinceInputId').val() + "-01-01";
 
-						self.ajaxInsights(actions, otherparams);
+		// 				self.ajaxInsights(actions, otherparams);
 
-						$('#tellUsMoreModal').modal('hide');
-					});
+		// 				$('#tellUsMoreModal').modal('hide');
+		// 			});
 
-					self.ajaxInsights(['done']);
-					$('#tellUsMoreModal').modal('show');
-				}
+		// 			self.ajaxInsights(['done']);
+		// 			$('#tellUsMoreModal').modal('show');
+		// 		}
 
-				e.preventDefault();
-			});
+		// 		e.preventDefault();
+		// 	});
 
-		},
+		// },
 
 		setApplauseLabels: function () {
 			var self = this;
@@ -834,8 +868,16 @@ var neayiinteractions_controller = (function () {
 				applauses = String(Math.round(applauses / 100) / 10) + " k";
 			else if (applauses == 0)
 				applauses = "";
+			
+			if (self.hasApplaused()) {
+				$('.neayi-interaction-applause').html('<span class="material-icons align-middle">thumb_up</span> ' + mw.msg('neayiinteractions-applause-button')).prop("disabled", false);
+				$('.neayi-footer-button-applause').html('<span class="material-icons">thumb_up</span>').prop("disabled", false);				
+			}
+			else {
+				$('.neayi-interaction-applause').html('<span class="material-icons-outlined align-middle">thumb_up</span> ' + mw.msg('neayiinteractions-applause-button')).prop("disabled", false);
+				$('.neayi-footer-button-applause').html('<span class="material-icons-outlined">thumb_up</span>').prop("disabled", false);				
+			}
 
-			$('.neayi-interaction-applause').html(`<img src="${self.imagepath}clap.svg" width="28">`).prop("disabled", false);
 			$('.neayi-interaction-applause-label').text(applauses);
 		},
 
@@ -851,68 +893,68 @@ var neayiinteractions_controller = (function () {
 			else
 				$( '.neayi-interaction-suivre-label' ).text(mw.msg('neayiinteractions-interested-count', followers));
 
-			if (followers < 2)
-				$( '.rightSide .label-community-count' ).text("");
-			else
-				$( '.rightSide .label-community-count' ).text(mw.msg('neayiinteractions-community-count', followers));
-
-			if (this.hasFollowed())
-				$( '.neayi-interaction-suivre' ).html(`<span style="vertical-align: middle;">` + mw.msg('neayiinteractions-followed') + `</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">check</span>`).prop("disabled", false);
-			else
-				$( '.neayi-interaction-suivre' ).text(mw.msg('neayiinteractions-follow')).prop("disabled", false);
-		},
-
-		setDoneItLabels: function () {
-			var doers = 0;
-			var interactions = mw.config.get('mwInteractions');
-			if (interactions && interactions.counts.done)
-				doers = interactions.counts.done;
-
-			if (doers == 0)
-				doers = "";
-			else if (doers >= 1000)
-				doers = mw.msg('neayiinteractions-nk-doers', String(Math.round(doers / 100) / 10));
-			else
-				doers = mw.msg('neayiinteractions-n-doers', doers);
-
-			$( '.neayi-interaction-doneit-label' ).text(doers);
-
-			var labelDone = mw.msg('neayiinteractions-done-it-confirmed'); // "Fait !";
-			var labelMarkAsDone = mw.msg('neayiinteractions-I-do-it'); // "Je le fais";
-
-			if ($( '#neayi-type-page' ))
-			{
-				var typePage = $( '#neayi-type-page' ).text();
-				switch (typePage) {
-					case 'Production':
-						labelDone = mw.msg('neayiinteractions-done-it-confirmed'); // "Fait !";
-						labelMarkAsDone = mw.msg('neayiinteractions-I-do-it-production'); // "J'en fais";
-						break;
-
-					case 'Ravageur':
-						labelDone = mw.msg('neayiinteractions-have-some-confirmed'); // "J'en ai !";
-						labelMarkAsDone = mw.msg('neayiinteractions-I-have-some'); // "J'en ai";
-						break;
-
-					case 'Matériel':
-						labelDone = mw.msg('neayiinteractions-have-it-confirmed'); // "Je l'ai !";
-						labelMarkAsDone = mw.msg('neayiinteractions-I-have-it'); // "Je l'ai";
-						break;
-
-					default:
-						break;
-				}
-
+			if (this.hasFollowed()) {
+				$( '.neayi-interaction-suivre' ).html(`<span class="align-middle">` + mw.msg('neayiinteractions-followed') + `</span> <span class="material-icons align-middle" aria-hidden="true">check</span>`).prop("disabled", false);
+				$( '.neayi-footer-button-suivre' ).html('<span class="material-icons align-middle">notifications</span>').prop("disabled", false);
 			}
+			else {
+				$( '.neayi-interaction-suivre' ).html('<span class="material-icons-outlined align-middle">notifications</span> ' + mw.msg('neayiinteractions-follow')).prop("disabled", false);
+				$( '.neayi-footer-button-suivre' ).html('<span class="material-icons-outlined align-middle">notifications</span>').prop("disabled", false);
+			}		
 
-			if (this.hasDone())
-				$( '.neayi-interaction-doneit' ).html(`<span style="vertical-align: middle;">${labelDone}</span> <span style="vertical-align: middle;" class="material-icons" aria-hidden="true">beenhere</span>`).prop("disabled", false);
-			else
-				$( '.neayi-interaction-doneit' ).text(labelMarkAsDone).prop("disabled", false);
 		},
+
+		// setDoneItLabels: function () {
+		// 	var doers = 0;
+		// 	var interactions = mw.config.get('mwInteractions');
+		// 	if (interactions && interactions.counts.done)
+		// 		doers = interactions.counts.done;
+
+		// 	if (doers == 0)
+		// 		doers = "";
+		// 	else if (doers >= 1000)
+		// 		doers = mw.msg('neayiinteractions-nk-doers', String(Math.round(doers / 100) / 10));
+		// 	else
+		// 		doers = mw.msg('neayiinteractions-n-doers', doers);
+
+		// 	$( '.neayi-interaction-doneit-label' ).text(doers);
+
+		// 	var labelDone = mw.msg('neayiinteractions-done-it-confirmed'); // "Fait !";
+		// 	var labelMarkAsDone = mw.msg('neayiinteractions-I-do-it'); // "Je le fais";
+
+		// 	if ($( '#neayi-type-page' ))
+		// 	{
+		// 		var typePage = $( '#neayi-type-page' ).text();
+		// 		switch (typePage) {
+		// 			case 'Production':
+		// 				labelDone = mw.msg('neayiinteractions-done-it-confirmed'); // "Fait !";
+		// 				labelMarkAsDone = mw.msg('neayiinteractions-I-do-it-production'); // "J'en fais";
+		// 				break;
+
+		// 			case 'Ravageur':
+		// 				labelDone = mw.msg('neayiinteractions-have-some-confirmed'); // "J'en ai !";
+		// 				labelMarkAsDone = mw.msg('neayiinteractions-I-have-some'); // "J'en ai";
+		// 				break;
+
+		// 			case 'Matériel':
+		// 				labelDone = mw.msg('neayiinteractions-have-it-confirmed'); // "Je l'ai !";
+		// 				labelMarkAsDone = mw.msg('neayiinteractions-I-have-it'); // "Je l'ai";
+		// 				break;
+
+		// 			default:
+		// 				break;
+		// 		}
+
+		// 	}
+
+		// 	if (this.hasDone())
+		// 		$( '.neayi-interaction-doneit' ).html(`<span class="align-middle">${labelDone}</span> <span class="material-icons align-middle" aria-hidden="true">beenhere</span>`).prop("disabled", false);
+		// 	else
+		// 		$( '.neayi-interaction-doneit' ).text(labelMarkAsDone).prop("disabled", false);
+		// },
 
 		disableButton: function (buttons) {
-			buttons.html(`<div class="spinner-border spinner-border-sm" role="status">
+			buttons.find('.material-icons-outlined, .material-icons, .fa').replaceWith(`<div class="spinner-border spinner-border-sm" role="status">
 							<span class="sr-only">` + mw.msg('neayiinteractions-loading') + `</span>
 						 </div>`);
 			buttons.prop("disabled", true);
@@ -992,10 +1034,12 @@ var neayiinteractions_controller = (function () {
 
 			var self = this;
 
-			$('.rightSide .avatars').html('');
+			$('.avatars').html('');
 
-			if (data.length < 2)
+			if (data.length < 2) {
+				$( '.avatars-container' ).hide();
 				return;
+			}				
 
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
 
@@ -1013,18 +1057,36 @@ var neayiinteractions_controller = (function () {
 					usersToShow.unshift(user);
 			});
 
-			if (usersToShow.length < 2)
+			if (usersToShow.length < 2) {
+				$( '.avatars-container' ).hide();
 				return;
+			}				
 
 			usersToShow.slice(-5).forEach(user => {
 
 				var userdetails = user['user'];
 
 				var avatarURL = insightsURL + 'api/user/avatar/' + userdetails['user_uid'] + '/100';
-				var avatarDiv = `<span class="avatar"><img src="${avatarURL}"></span>`;
+				var avatarDiv = `<div class="avatar"><img src="${avatarURL}"></div>`;
 
-				$( '.rightSide .avatars' ).append(avatarDiv);
+				$( '.avatars' ).append(avatarDiv);
 			});
+
+			let count = usersToShow.length;
+			if (usersToShow.length > 5)
+				count = '+' + (usersToShow.length - 5);
+
+			let infoMsg = mw.msg('neayiinteractions-infos');
+			let avatarsChain = `<div class="avatar avatar-count"><span class="avatar-infos"><span class="material-icons align-middle">people</span> ${infoMsg}</span><span class="avatar-count-number">${count}</span></div>`;
+
+			$( '.avatars' ).append(avatarsChain);
+
+			if (usersToShow.length == 1)
+				$( '.avatars' ).addClass('avatars-1');
+			else if (usersToShow.length == 2)
+				$( '.avatars' ).addClass('avatars-2');
+			else if (usersToShow.length == 3)
+				$( '.avatars' ).addClass('avatars-3');
 		},
 
 		/**
@@ -1039,6 +1101,9 @@ var neayiinteractions_controller = (function () {
 				$('#community-items').html('');
 
 			var connectedUserGUID = mw.config.get('NeayiInteractions').wgUserGuid;
+			var config = mw.config.get('DiscourseIntegration');
+
+			let DiscourseURL = config.DiscourseURL;
 
 			data.forEach(user => {
 
@@ -1049,21 +1114,21 @@ var neayiinteractions_controller = (function () {
 
 				if (context['structure'] == 'Triple Performance')
 					return;
-
+				
 				var subTitle = context['sector'];
 				if (context['structure'] != '')
 					subTitle = subTitle + ' (<a href="/wiki/Structure:'+context['structure']+'">'+context['structure']+'</a>)';
 				subTitle = '<div class="follower-item-usertitle">' + subTitle + '</div>';
 
-				var interaction = '<span class="status">Le suit</span>';
-				if (user['interaction']['done'] == true)
-				{
-					if (user['interaction']['done_at'] == null)
-						interaction = '<span class="status">Le fait</span>';
-					else
-						interaction = '<span class="status">Le fait depuis ' + user['interaction']['done_at'].substring(0, 4) + '</span>';
-				}
-
+				var interaction = '<span class="status">'+mw.msg("neayiinteractions-status-follow-page-label")+'</span>';
+				// if (user['interaction']['done'] == true)
+				// {
+				// 	if (user['interaction']['done_at'] == null)
+				// 		interaction = '<span class="status">'+mw.msg("neayiinteractions-status-doneit-label") + '</span>';
+				// 	else
+				// 		interaction = '<span class="status">'+mw.msg("neayiinteractions-status-doneit-since-label", user['interaction']['done_at'].substring(0, 4)) + '</span>';
+				// }
+				
 				var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
 
 				var profileURL = insightsURL + 'tp/' + encodeURI(context['fullname']) +'/' + context['user_uuid'];
@@ -1073,15 +1138,23 @@ var neayiinteractions_controller = (function () {
 				var avatarURL = insightsURL + 'api/user/avatar/' + context['user_uuid'] + '/100';
 				var avatarDiv = `<div class="follower-item-avatar"><img src="${avatarURL}" /></div>`;
 				var userName = `<a href="${profileURL}">${context['fullname']}</a>`;
-				userName = '<div class="follower-item-username">'+userName + ' ' + interaction+'</div>';
+
+				let discussURL = '';
+				if (user['user']['discourse_username'] != undefined)
+				{
+					discussURL = DiscourseURL + '/new-message?username=' + user['user']['discourse_username'] + '&title=&body=';
+					discussURL = `<div><a class="btn btn-dark-green direct-message" href="${discussURL}" target="_blank"><i class="fas fa-envelope"></i> ${mw.msg("neayiinteractions-direct-message-button-label")}</a></div>`;
+				}
+
+				userName = '<div class="follower-item-username">'+userName + ' ' + interaction + '</div>' + subTitle + discussURL;
 
 				var characteristicsPlaceholder = `<div class="follower-item-features flex-fill">
-														<div class="d-flex flex-wrap justify-content-start caracteristiques-exploitation"></div>
+														<div class="d-none d-md-flex flex-wrap justify-content-start caracteristiques-exploitation"></div>
 													</div>`;
 
-				var userdiv = $(`<div class="follower-item d-flex flex-wrap">
+				var userdiv = $(`<div class="follower-item d-flex">
 									${avatarDiv}
-									<div class="follower-item-user">${userName} ${subTitle}</div>
+									<div class="follower-item-user">${userName}</div>
 									${characteristicsPlaceholder}
 								</div>`);
 
@@ -1217,7 +1290,7 @@ var neayiinteractions_controller = (function () {
 			if (!DIConfig)
 				return;
 
-			if ($('#side-map-svg').length > 0)
+			if ($('#side-map-svg, #map-svg').length > 0)
 				return this.refreshMap(deptStats);
 
 			const width = 300, height = 270;
@@ -1380,10 +1453,12 @@ var neayiinteractions_controller = (function () {
 			var DIConfig = mw.config.get('DiscourseIntegration');
 			if (!DIConfig)
 				return;
+
 			// On calcule le max de la population pour adapter les couleurs
 			var quantile = d3.scaleQuantile()
 				.domain([0, d3.max(deptStats, e => +e.count)])
 				.range(d3.range(9));
+
 			d3.selectAll('#map path')
 				.attr('class', '')
 				.on('mouseover', null)
@@ -1394,6 +1469,7 @@ var neayiinteractions_controller = (function () {
 				.on('mouseover', null)
 				.on('mouseout', null)
 				.on('click', null);
+
 			deptStats.forEach(function (e, i) {
 				d3.select('#d' + e.department_number)
 					.attr('class', d => 'department q' + quantile(+e.count) + '-9')

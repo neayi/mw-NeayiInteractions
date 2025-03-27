@@ -20,7 +20,19 @@
     "neayiinteractions-I-have-some": "Done it button - I have those",
     "neayiinteractions-have-it-confirmed": "Done it button - I have it !",
     "neayiinteractions-I-have-it": "Done it button - I have it",
+    "neayiinteractions-direct-message-button-label": null,
+    "neayiinteractions-status-follow-page-label": null,
+    "neayiinteractions-status-doneit-label": null,
+    "neayiinteractions-status-doneit-since-label": null,
     "neayiinteractions-loading": "Loading placeholder",
     "neayiinteractions-map-departement": "Label for the county in the map",
-    "neayiinteractions-map-community-size": "Label for the size of the community in the map"
+    "neayiinteractions-map-community-size": "Label for the size of the community in the map",
+    "neayiinteractions-read-more-button": null,
+    "neayiinteractions-discussion-messages": null,
+    "neayiinteractions-applause-button": null,
+    "neayiinteractions-ask-question": null,
+    "neayiinteractions-question_hint-1": null,
+    "neayiinteractions-question_hint-2": null,
+    "neayiinteractions-question_hint-3": null,
+    "neayiinteractions-infos": null
 }
