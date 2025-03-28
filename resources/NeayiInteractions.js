@@ -1037,6 +1037,7 @@ var neayiinteractions_controller = (function () {
 			$('.avatars').html('');
 
 			if (data.length < 2) {
+				$( '.avatars-container' ).removeClass("d-md-inline-block");
 				$( '.avatars-container' ).hide();
 				return;
 			}				
@@ -1058,6 +1059,7 @@ var neayiinteractions_controller = (function () {
 			});
 
 			if (usersToShow.length < 2) {
+				$( '.avatars-container' ).removeClass("d-md-inline-block");
 				$( '.avatars-container' ).hide();
 				return;
 			}				
@@ -1102,6 +1104,9 @@ var neayiinteractions_controller = (function () {
 
 			var connectedUserGUID = mw.config.get('NeayiInteractions').wgUserGuid;
 			var config = mw.config.get('DiscourseIntegration');
+
+			if (config == undefined)
+				return;
 
 			let DiscourseURL = config.DiscourseURL;
 
