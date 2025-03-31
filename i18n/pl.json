@@ -23,7 +23,7 @@
     "neayiinteractions-direct-message-button-label": "Bezpośrednia wiadomość",
     "neayiinteractions-status-follow-page-label": "Obserwuje stronę",
     "neayiinteractions-status-doneit-label": "Wykonaj tę praktykę",
-    "neayiinteractions-status-doneit-since-label": "Robi to od 1 dolara",
+    "neayiinteractions-status-doneit-since-label": "Robi to już od 1 dolara",
     "neayiinteractions-loading": "Załadunek...",
     "neayiinteractions-map-departement": "<b>Dział:<\/b> $1",
     "neayiinteractions-map-community-size": "<b>Społeczność:<\/b> $1",
@@ -34,5 +34,7 @@
     "neayiinteractions-question_hint-1": "Gdzie znajdziemy...",
     "neayiinteractions-question_hint-2": "Czy jest to możliwe w...",
     "neayiinteractions-question_hint-3": "Czy to jest kompatybilne z...",
-    "neayiinteractions-infos": "Informacje"
+    "neayiinteractions-infos": "Informacje",
+    "neayiinteractions-more-label": "Więcej",
+    "neayiinteractions-less-label": "Mniej"
 }

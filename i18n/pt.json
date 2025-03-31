@@ -30,9 +30,11 @@
     "neayiinteractions-read-more-button": "Leia mais",
     "neayiinteractions-discussion-messages": "{{PLURAL:$1|Discussão sobre este tópico ($1 mensagem)|Discussão sobre este tópico ($1 mensagens)}}",
     "neayiinteractions-applause-button": "Instrutivo",
-    "neayiinteractions-ask-question": "Faça uma pergunta, compartilhe comentários:",
+    "neayiinteractions-ask-question": "Faça uma pergunta e compartilhe comentários:",
     "neayiinteractions-question_hint-1": "Onde encontramos...",
     "neayiinteractions-question_hint-2": "Isso é possível em...",
     "neayiinteractions-question_hint-3": "Isso é compatível com...",
-    "neayiinteractions-infos": "Informações"
+    "neayiinteractions-infos": "Informações",
+    "neayiinteractions-more-label": "Mais",
+    "neayiinteractions-less-label": "Menos"
 }

@@ -33,6 +33,8 @@
     "neayiinteractions-ask-question": "Haga una pregunta, comparta comentarios:",
     "neayiinteractions-question_hint-1": "¿Dónde encontramos...?",
     "neayiinteractions-question_hint-2": "¿Es esto posible en...",
-    "neayiinteractions-question_hint-3": "¿Es esto compatible con...?",
-    "neayiinteractions-infos": "Información"
+    "neayiinteractions-question_hint-3": "¿Es compatible con...?",
+    "neayiinteractions-infos": "Información",
+    "neayiinteractions-more-label": "Más",
+    "neayiinteractions-less-label": "Menos"
 }

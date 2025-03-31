@@ -69,7 +69,9 @@
                 "neayiinteractions-question_hint-1",
                 "neayiinteractions-question_hint-2",
                 "neayiinteractions-question_hint-3",
-                "neayiinteractions-infos"
+                "neayiinteractions-infos",
+                "neayiinteractions-more-label",
+                "neayiinteractions-less-label"
 			]
 		},
 		"ext.d3.core": {

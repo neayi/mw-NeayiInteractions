@@ -34,5 +34,7 @@
     "neayiinteractions-question_hint-1": "Où trouve-t-on ...",
     "neayiinteractions-question_hint-2": "Est-ce possible dans ...",
     "neayiinteractions-question_hint-3": "Est-ce compatible avec ...",
-    "neayiinteractions-infos": "Infos"
+    "neayiinteractions-infos": "Infos",
+    "neayiinteractions-more-label": "Plus",
+    "neayiinteractions-less-label": "Moins"
 }

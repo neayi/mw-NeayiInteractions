@@ -766,11 +766,12 @@ var neayiinteractions_controller = (function () {
 				self.logEvent('drawer_open', "Ouverture du tiroir bas", 'interaction_buttons');
 
 				if (self.drawerHeightSet == undefined) {
+					$('#drawer-height-style').remove();
 					// Get the height of the sticky title and of the footer buttons : 
 					let titleHeight = $('.title-sticky').outerHeight(true) + $('.footer-buttons-container').outerHeight(true);
 					let maxDrawerHeight = (window.innerHeight - titleHeight)  + 'px';
 
-					$(`<style>
+					$(`<style id="drawer-height-style">
 						.social-sticky .footer-drawer.opened  {
 							max-height: ${maxDrawerHeight};
 						}
@@ -781,7 +782,31 @@ var neayiinteractions_controller = (function () {
 
 				$(this).toggleClass( 'opened' );
 				$('.footer-drawer').toggleClass( 'opened' );
+
+				if ($(this).hasClass( 'opened' ))
+					$('.footer-more-button .neayi-footer-button-label').text(mw.msg('neayiinteractions-less-label'));
+				else
+					$('.footer-more-button .neayi-footer-button-label').text(mw.msg('neayiinteractions-more-label'));
 			});
+			
+			// When the windows is resized recalculate the new max height
+			$(window).on('resize', OO.ui.debounce(function() {
+
+				$('#drawer-height-style').remove();
+
+				// Get the height of the sticky title and of the footer buttons : 
+				let titleHeight = $('.title-sticky').outerHeight(true) + $('.footer-buttons-container').outerHeight(true);
+				let maxDrawerHeight = (window.innerHeight - titleHeight)  + 'px';
+
+				$(`<style id="drawer-height-style">
+					.social-sticky .footer-drawer.opened  {
+						max-height: ${maxDrawerHeight};
+					}
+					</style>`).appendTo('head');
+
+				self.drawerHeightSet = true;
+
+			}, 500));			
 		},
 
 		/**
