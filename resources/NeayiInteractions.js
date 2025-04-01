@@ -1145,8 +1145,8 @@ var neayiinteractions_controller = (function () {
 				if (context['structure'] == 'Triple Performance')
 					return;
 				
-				var subTitle = context['sector'];
-				if (context['structure'] != '')
+				var subTitle = context['sector'] ?? '';
+				if (context['structure'] != '' && context['structure'] != null)
 					subTitle = subTitle + ' (<a href="/wiki/Structure:'+context['structure']+'">'+context['structure']+'</a>)';
 				subTitle = '<div class="follower-item-usertitle">' + subTitle + '</div>';
 
@@ -1191,7 +1191,7 @@ var neayiinteractions_controller = (function () {
 				var features = userdiv.find( 'div.caracteristiques-exploitation' );
 
 				// Add the department
-				if (context['department'] != "")
+				if (context['department'] != null)
 				{
 					var depName = context['characteristics_departement'][0].page;
 					var depIcon = context['characteristics_departement'][0].icon;
