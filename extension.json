@@ -32,7 +32,8 @@
 				"ext.d3.core",
 				"jquery.ui",
 				"mediawiki.api",
-				"ext.bootstrap"
+				"ext.bootstrap",
+				"oojs-ui-core"
 			],
 			"targets": [
 				"desktop",
