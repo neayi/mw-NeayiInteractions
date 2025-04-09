@@ -120,6 +120,11 @@ var neayiinteractions_controller = (function () {
 			self.setupPageViewsCount();
 			let mainHeader = $('#firstHeading .mw-page-title-main');
 
+			$('.type-production').each(function() {
+				_paq.push(['setCustomDimension', 1, this.innerText]);
+				console.log(this.innerText);
+			});
+
 			if (self.heroMode)
 				mainHeader = $(".hero-portail h1");
 
