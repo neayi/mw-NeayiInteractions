@@ -361,6 +361,10 @@ var neayiinteractions_controller = (function () {
 				if ($('.social-sticky').length == 0)
 					return;
 
+				// If we are in edit mode somehow, we remove the the social sticky bar
+				if ($(".oo-ui-toolbar-bar").length > 0)
+					$('.social-sticky').remove();
+
 				var threshold = Math.min($('.social-sticky').next().position().top - $(window).height(), 500);
 
 				if($(window).scrollTop() > threshold)
