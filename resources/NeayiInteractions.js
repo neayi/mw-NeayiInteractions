@@ -40,6 +40,7 @@ var neayiinteractions_controller = (function () {
 			}				
 
 			this.setPortal();
+			this.setPageClass();
 
 			if (this.isInIframe()) {
 				this.setupPageAsIframe();
@@ -1558,6 +1559,21 @@ var neayiinteractions_controller = (function () {
 						self.logEvent('inpagemap_click', 'Clic sur la carte dans la marge', 'interaction_buttons');
 					});
 			});
+		},
+
+		/**
+		 * Finds a span on the page with the class page-style, then get the value of the data-classname attribute, and sets the classname to the body
+		 * @returns {void}
+		 */
+		setPageClass: function () {
+			let span = $('span.page-style');
+
+			if (span.length === 0) {
+				// If no span found, we return
+				return;
+			}
+
+			$('body').addClass(span.data('classname'));
 		}
 	};
 }());
