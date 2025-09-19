@@ -153,7 +153,7 @@ class NeayiInteractions {
 	 */
 	private function getNeayiGUID( $user )
 	{
-		$dbr = wfGetDB(DB_REPLICA);
+		$dbr = MediaWikiServices::getInstance()->getConnectionProvider()->getReplicaDatabase();
 		$result = $dbr->selectRow(
 			'neayiauth_users',
 			[
@@ -175,7 +175,7 @@ class NeayiInteractions {
 	 */
 	private static function getNeayiApiToken( $user )
 	{
-		$dbr = wfGetDB(DB_REPLICA);
+		$dbr = MediaWikiServices::getInstance()->getConnectionProvider()->getReplicaDatabase();
 		$result = $dbr->selectRow(
 			'neayiauth_users',
 			[
