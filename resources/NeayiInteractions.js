@@ -75,6 +75,9 @@ var neayiinteractions_controller = (function () {
 
 			var heroImage = $('img.portail-background');
 
+			if (heroImage.length == 0) // M1.43
+				heroImage = $('.portail-background img');;
+
 			if (heroImage.length == 0)
 				return;
 
@@ -89,13 +92,22 @@ var neayiinteractions_controller = (function () {
 			// Move the subtitles and images
 			$('span.portal-subtitle').detach().appendTo('.hero-portail h2');
 			$('#content img.portrait-agris').detach().appendTo('.hero-titles');
+			$('#content .portrait-agris img').detach().appendTo('.hero-titles').addClass('portrait-agris');
 
 			$('#content img.portrait-logo').parent('a').each(function() {
 				$(this).detach().appendTo('.hero-titles');
 			});
 
+			// M1.43
+			$('#content .portrait-logo').parent('a').each(function() {
+				$(this).detach().appendTo('.hero-titles');
+			});
+
 			$('#content img.portrait-logo').detach().appendTo('.hero-titles');
+			$('#content .portrait-logo img').detach().appendTo('.hero-titles').addClass('portrait-logo');
+
 			$('span.hero-tags').detach().appendTo('.hero-titles');
+
 
 			// if ($('span.portrait-de-ferme').length > 0)
 			// {
