@@ -99,8 +99,8 @@ var neayiinteractions_controller = (function () {
 			});
 
 			// M1.43
-			$('#content .portrait-logo').parent('a').each(function() {
-				$(this).detach().appendTo('.hero-titles');
+			$('#content .portrait-logo a').each(function() {
+				$(this).detach().appendTo('.hero-titles').find('img').addClass('portrait-logo');
 			});
 
 			$('#content img.portrait-logo').detach().appendTo('.hero-titles');
