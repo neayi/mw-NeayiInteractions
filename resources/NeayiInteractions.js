@@ -37,7 +37,7 @@ var neayiinteractions_controller = (function () {
 			if (pageId == 0) {
 				$('.interaction-bloc').hide();
 				return;
-			}				
+			}
 
 			this.setPortal();
 			this.setPageClass();
@@ -147,7 +147,7 @@ var neayiinteractions_controller = (function () {
 					<span class="material-icons align-middle" aria-hidden="true">more_vert</span>
 				</button></span>`);
 
-				$('#p-contentnavigation').clone(true).appendTo(".pageMenu").removeAttr('id');	
+				$('#p-contentnavigation').clone(true).appendTo(".pageMenu").removeAttr('id');
 			}
 
 			// Move the language dropdown somewhere visible
@@ -789,7 +789,7 @@ var neayiinteractions_controller = (function () {
 
 				if (self.drawerHeightSet == undefined) {
 					$('#drawer-height-style').remove();
-					// Get the height of the sticky title and of the footer buttons : 
+					// Get the height of the sticky title and of the footer buttons :
 					let titleHeight = $('.title-sticky').outerHeight(true) + $('.footer-buttons-container').outerHeight(true);
 					let maxDrawerHeight = (window.innerHeight - titleHeight)  + 'px';
 
@@ -810,13 +810,13 @@ var neayiinteractions_controller = (function () {
 				else
 					$('.footer-more-button .neayi-footer-button-label').text(mw.msg('neayiinteractions-more-label'));
 			});
-			
+
 			// When the windows is resized recalculate the new max height
 			$(window).on('resize', OO.ui.debounce(function() {
 
 				$('#drawer-height-style').remove();
 
-				// Get the height of the sticky title and of the footer buttons : 
+				// Get the height of the sticky title and of the footer buttons :
 				let titleHeight = $('.title-sticky').outerHeight(true) + $('.footer-buttons-container').outerHeight(true);
 				let maxDrawerHeight = (window.innerHeight - titleHeight)  + 'px';
 
@@ -828,7 +828,7 @@ var neayiinteractions_controller = (function () {
 
 				self.drawerHeightSet = true;
 
-			}, 500));			
+			}, 500));
 		},
 
 		/**
@@ -915,14 +915,14 @@ var neayiinteractions_controller = (function () {
 				applauses = String(Math.round(applauses / 100) / 10) + " k";
 			else if (applauses == 0)
 				applauses = "";
-			
+
 			if (self.hasApplaused()) {
 				$('.neayi-interaction-applause').html('<span class="material-icons align-middle">thumb_up</span> ' + mw.msg('neayiinteractions-applause-button')).prop("disabled", false);
-				$('.neayi-footer-button-applause').html('<span class="material-icons">thumb_up</span>').prop("disabled", false);				
+				$('.neayi-footer-button-applause').html('<span class="material-icons">thumb_up</span>').prop("disabled", false);
 			}
 			else {
 				$('.neayi-interaction-applause').html('<span class="material-icons-outlined align-middle">thumb_up</span> ' + mw.msg('neayiinteractions-applause-button')).prop("disabled", false);
-				$('.neayi-footer-button-applause').html('<span class="material-icons-outlined">thumb_up</span>').prop("disabled", false);				
+				$('.neayi-footer-button-applause').html('<span class="material-icons-outlined">thumb_up</span>').prop("disabled", false);
 			}
 
 			$('.neayi-interaction-applause-label').text(applauses);
@@ -947,7 +947,7 @@ var neayiinteractions_controller = (function () {
 			else {
 				$( '.neayi-interaction-suivre' ).html('<span class="material-icons-outlined align-middle">notifications</span> ' + mw.msg('neayiinteractions-follow')).prop("disabled", false);
 				$( '.neayi-footer-button-suivre' ).html('<span class="material-icons-outlined align-middle">notifications</span>').prop("disabled", false);
-			}		
+			}
 
 		},
 
@@ -1087,7 +1087,7 @@ var neayiinteractions_controller = (function () {
 				$( '.avatars-container' ).removeClass("d-md-inline-block");
 				$( '.avatars-container' ).hide();
 				return;
-			}				
+			}
 
 			var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
 
@@ -1109,7 +1109,7 @@ var neayiinteractions_controller = (function () {
 				$( '.avatars-container' ).removeClass("d-md-inline-block");
 				$( '.avatars-container' ).hide();
 				return;
-			}				
+			}
 
 			usersToShow.slice(-5).forEach(user => {
 
@@ -1166,7 +1166,7 @@ var neayiinteractions_controller = (function () {
 
 				if (context['structure'] == 'Triple Performance')
 					return;
-				
+
 				var subTitle = context['sector'] ?? '';
 				if (context['structure'] != '' && context['structure'] != null)
 					subTitle = subTitle + ' (<a href="/wiki/Structure:'+context['structure']+'">'+context['structure']+'</a>)';
@@ -1180,7 +1180,7 @@ var neayiinteractions_controller = (function () {
 				// 	else
 				// 		interaction = '<span class="status">'+mw.msg("neayiinteractions-status-doneit-since-label", user['interaction']['done_at'].substring(0, 4)) + '</span>';
 				// }
-				
+
 				var insightsURL = mw.config.get('NeayiInteractions').wgInsightsRootURL;
 
 				var profileURL = insightsURL + 'tp/' + encodeURI(context['fullname']) +'/' + context['user_uuid'];
@@ -1600,71 +1600,3 @@ window.NeayiInteractionsController = neayiinteractions_controller;
 			}
 		});
 }());
-
-
-document.addEventListener('wsf-search-executed', function (event) {
-    var query = event.detail.query;
-    console.log('Requête générée par WikiSearchFront :', query);
-    // Traitez la requête ici
-});
-
-mw.hook('wikisearchfrontent-pre-api-call').add(function(params) {
-	if (params.action === 'query') {
-
-		// Ignore this event if there are no maps on the page
-		if (window.mapsLeafletList === undefined || window.mapsLeafletList.length === 0) {
-			return;
-		}
-
-		// We clone the params to not modify the original object (which is going to be user by WikiSearchFront later)
-		let geoParams = { ...params };
-
-		// Get the first map on the page that has the ajaxcoordproperty set
-		let map = window.mapsLeafletList.find(map => map.options.ajaxcoordproperty !== undefined && map.options.ajaxcoordproperty.length > 0);
-		if (!map) {
-			console.log('No map with ajaxcoordproperty found');
-			return;
-		}
-
-		// We grab the property which contains the coordinates
-		let coordinatesProperty = map.options.ajaxcoordproperty;
-				
-		let filters = JSON.parse(params.filter);
-
-		// We only want results which have coordinates
-		filters.push({"value":"+","key": coordinatesProperty});
-
-		geoParams.filter = JSON.stringify(filters);
-
-		// We limit the number of results to what is configured in the map
-		geoParams.limit = map.options.limit ?? 500;
-
-		// Use the WikiSearch API to get the results
-		let api = new mw.Api();
-		api.post(geoParams).done(function(data) {
-			let hits = JSON.parse(data.result.hits);
-
-			map.removeMarkers();
-
-			hits.forEach(hit => {
-			
-				// Get the first member of the source object that has a geoField key
-				let geoField = Object.values(hit._source).find(t => Object.keys(t).includes('geoField'));
-				let coordinates = geoField.geoField[0].split(',');
-
-				let title = hit._source.subject.title;
-				let url = mw.util.getUrl(title);
-
-				let markerOptions = {
-					lat: coordinates[0],
-					lon: coordinates[1],
-					title: title,
-					text: '<b><a href="' + url + '">' + title + '</a></b>',
-					icon: ""
-				};
-
-				map.addMarker( markerOptions );
-			});	
-		});
-	}
-});
