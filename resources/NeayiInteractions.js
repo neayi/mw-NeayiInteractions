@@ -1213,7 +1213,7 @@ var neayiinteractions_controller = (function () {
 				var features = userdiv.find( 'div.caracteristiques-exploitation' );
 
 				// Add the department
-				if (context['department'] != null)
+				if (context['department'] != null && context['characteristics_departement']?.length > 0)
 				{
 					var depName = context['characteristics_departement'][0].page;
 					var depIcon = context['characteristics_departement'][0].icon;
